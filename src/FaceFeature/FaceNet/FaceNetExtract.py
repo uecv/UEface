@@ -12,8 +12,8 @@ class FaceNetExtract:
     def __init__(self):
         conf = config()
 
-        self.model = conf.faceFeatureModel()
-        self.aligner = conf.alignerModel()
+        self.model = conf.getfaceFeatureModel()
+        self.aligner = conf.getalignerModel()
 
 
     def Extract(self, image , locations, landmarks):
