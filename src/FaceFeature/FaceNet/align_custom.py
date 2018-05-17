@@ -16,12 +16,12 @@ import numpy as np
 class AlignCustom(object):
     def __init__(self):
         pass
-    
+
     def getPos(self, points):
         if abs(points[0] - points[2]) / abs(points[1] - points[2]) > 2:
-            return "Right";
+            return "Right"
         elif abs(points[1] - points[2]) / abs(points[0] - points[2]) > 2:
-            return "Left";
+            return "Left"
         return "Center"
 
     def list2colmatrix(self, pts_list):
@@ -73,7 +73,8 @@ class AlignCustom(object):
             sigma_from += temp_dis * temp_dis
             temp_dis = np.linalg.norm(to_shape_points[i] - mean_to)
             sigma_to += temp_dis * temp_dis
-            cov += (to_shape_points[i].transpose() - mean_to.transpose()) * (from_shape_points[i] - mean_from)
+            cov += (to_shape_points[i].transpose() -
+                    mean_to.transpose()) * (from_shape_points[i] - mean_from)
 
         sigma_from = sigma_from / to_shape_points.shape[0]
         sigma_to = sigma_to / to_shape_points.shape[0]
@@ -120,15 +121,27 @@ class AlignCustom(object):
         else:
             padding = 0
         # average positions of face points
-        mean_face_shape_x = [0.224152, 0.75610125, 0.490127, 0.254149, 0.726104]
-        mean_face_shape_y = [0.2119465, 0.2119465, 0.628106, 0.780233, 0.780233]
+        mean_face_shape_x = [
+            0.224152,
+            0.75610125,
+            0.490127,
+            0.254149,
+            0.726104]
+        mean_face_shape_y = [
+            0.2119465,
+            0.2119465,
+            0.628106,
+            0.780233,
+            0.780233]
 
         from_points = []
         to_points = []
 
         for i in range(int(len(shape) / 2)):
-            x = (padding + mean_face_shape_x[i]) / (2 * padding + 1) * desired_size
-            y = (padding + mean_face_shape_y[i]) / (2 * padding + 1) * desired_size
+            x = (padding + mean_face_shape_x[i]) / \
+                (2 * padding + 1) * desired_size
+            y = (padding + mean_face_shape_y[i]) / \
+                (2 * padding + 1) * desired_size
             to_points.append([x, y])
             from_points.append([shape[2 * i], shape[2 * i + 1]])
 
@@ -145,7 +158,9 @@ class AlignCustom(object):
         scale = np.linalg.norm(probe_vec)
         angle = 180.0 / math.pi * math.atan2(probe_vec[1, 0], probe_vec[0, 0])
 
-        from_center = [(shape[0] + shape[2]) / 2.0, (shape[1] + shape[3]) / 2.0]
+        from_center = [
+            (shape[0] + shape[2]) / 2.0,
+            (shape[1] + shape[3]) / 2.0]
         to_center = [0, 0]
         to_center[1] = desired_size * 0.4
         to_center[0] = desired_size * 0.5
@@ -153,7 +168,8 @@ class AlignCustom(object):
         ex = to_center[0] - from_center[0]
         ey = to_center[1] - from_center[1]
 
-        rot_mat = cv2.getRotationMatrix2D((from_center[0], from_center[1]), -1 * angle, scale)
+        rot_mat = cv2.getRotationMatrix2D(
+            (from_center[0], from_center[1]), -1 * angle, scale)
 
         rot_mat[0][2] += ex
         rot_mat[1][2] += ey
