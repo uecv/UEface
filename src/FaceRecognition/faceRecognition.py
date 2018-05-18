@@ -1,7 +1,7 @@
 # coding:utf-8
 import datetime
 
-from src.DrawPicute.tensorflow_draw_location.draw_face_box import draw_box
+from src.DrawPicture.tensorflow_draw_location.draw_face_box import draw_box
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 
 
@@ -26,7 +26,7 @@ def recognition(frame, EncodingCache, known_face_dataset):
         EncodingCache.append(face)
 
     face_names = []
-    if len(face_locations) > 0:  # start(EncodingCache, face_encodings):  # 如果达到判断人脸的条件
+    if face_locations:  # start(EncodingCache, face_encodings):  # 如果达到判断人脸的条件
 
         face_names = Recognition .findPeople(
             face_encodings, positions, data_set=known_face_dataset)

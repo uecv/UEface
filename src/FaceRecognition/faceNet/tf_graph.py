@@ -11,4 +11,4 @@ class FaceRecGraph(object):
         '''
             There'll be more to come in this class
         '''
-        self.graph = tf.Graph();
+        self.graph = tf.Graph()

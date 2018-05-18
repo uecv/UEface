@@ -1,15 +1,19 @@
-#coding:utf-8
+# coding:utf-8
 '''
 @Author: David Vu
 Run the pretrained model to extract 128D face features
 '''
 
+import numpy as np
 import tensorflow as tf
 from src.Model.faceNet.architecture import inception_resnet_v1 as resnet
-import numpy as np
+
 
 class FaceFeature(object):
-    def __init__(self, face_rec_graph, model_path = 'models/model-20170512-110547.ckpt-250000'):
+    def __init__(
+            self,
+            face_rec_graph,
+            model_path='models/model-20170512-110547.ckpt-250000'):
         '''
 
         :param face_rec_sess: FaceRecSession object
@@ -18,28 +22,33 @@ class FaceFeature(object):
         print("Loading model...")
         with face_rec_graph.graph.as_default():
             self.sess = tf.Session()
-            self.x = tf.placeholder('float', [None,160,160,3]); #default input for the NN is 160x160x3
+            # default input for the NN is 160x160x3
+            self.x = tf.placeholder('float', [None, 160, 160, 3])
             self.embeddings = tf.nn.l2_normalize(
-                                        resnet.inference(self.x, 0.6, phase_train=False)[0], 1, 1e-10); #some magic numbers that u dont have to care about
+                resnet.inference(
+                    self.x,
+                    0.6,
+                    phase_train=False)[0],
+                1,
+                1e-10)  # some magic numbers that u dont have to care about
 
-            saver = tf.train.Saver() #saver load pretrain model
+            saver = tf.train.Saver()  # saver load pretrain model
             saver.restore(self.sess, model_path)
             print("Model loaded")
 
-
     def get_features(self, input_imgs):
-        images = load_data_list(input_imgs,160)
-        return self.sess.run(self.embeddings, feed_dict = {self.x : images})
+        images = load_data_list(input_imgs, 160)
+        return self.sess.run(self.embeddings, feed_dict={self.x: images})
 
 
-
-#some image preprocess stuff
+# some image preprocess stuff
 def prewhiten(x):
     mean = np.mean(x)
     std = np.std(x)
     std_adj = np.maximum(std, 1.0 / np.sqrt(x.size))
     y = np.multiply(np.subtract(x, mean), 1 / std_adj)
     return y
+
 
 def load_data_list(imgList, image_size, do_prewhiten=True):
     images = np.zeros((len(imgList), image_size, image_size, 3))

@@ -46,7 +46,7 @@ class FaceNetExtract:
                 print("Align face failed")  # log
 
         features_arr = []
-        if len(aligns) > 0:
+        if aligns:
             features_arr = self.model.get_features(aligns)
 
         return features_arr, positions
