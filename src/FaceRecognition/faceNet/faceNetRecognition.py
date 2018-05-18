@@ -35,7 +35,7 @@ class faceNetRecognition:
 
         features_arr = []
         positions = []
-        if(len(locations)>0):
+        if len(locations)>0:
             features_arr, positions = self.FaceFeature.Extract(image, locations, landmarks)
 
 
@@ -50,13 +50,13 @@ class faceNetRecognition:
             ymax = l[2]
             xmax = l[3]
 
-            cv2.rectangle(image, (xmin,ymax), (xmax,ymin), (255, 0, 0))
+            # cv2.rectangle(image, (xmin,ymax), (xmax,ymin), (255, 0, 0))
 
 
 
 
 
-        return np.array(locations),features_arr,positions,image
+        return np.array(locations),features_arr,positions
 
 
 
@@ -99,3 +99,19 @@ class faceNetRecognition:
                 result = "Unknown"
             returnRes.append((result,percentage))
         return returnRes
+
+
+    def Recognition(self,image,EncodingCache,known_face_dataset):
+
+        face_locations, face_encodings, positions = self.face_locations_encoding(image)
+
+        # 将人脸编码添加到缓存中
+        for face in face_encodings:
+            EncodingCache.append(face)
+
+        face_names = []
+        if len(face_locations) > 0:  # start(EncodingCache, face_encodings):  # 如果达到判断人脸的条件
+
+            face_names = self.findPeople(face_encodings, positions, data_set=known_face_dataset)
+
+        return face_names

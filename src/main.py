@@ -5,7 +5,7 @@ import cv2
 import face_recognition
 from src.FaceRecognition.faceRecognition import recognition
 from src.util.redis_queue import RedisQueue
-
+from src.Config.FaceNetconfig import config
 import  json
 q = RedisQueue('rq')  # 新建队列名为rq
 src ="rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
@@ -23,9 +23,9 @@ process_this_frame = True
 EncodingCache=[] #用于存储一段时间内脸部编码的缓存
 frame_number =0
 
-f = open('./Model/faceNet/facerec_128D.txt', 'r')
-known_face_dataset = json.loads(f.read())
-f.close()
+conf = config()
+known_face_dataset = conf.getKnown_face_dataset()
+
 
 
 jump=True
@@ -36,7 +36,7 @@ while True:
         # 获取一帧视频
         ret, frame = video_capture.read()
 
-        (frame,face_names,now_time,image) =recognition(frame,EncodingCache,known_face_dataset)
+        (frame,face_names,now_time) =recognition(frame,EncodingCache,known_face_dataset)
 
         print(face_names)
 

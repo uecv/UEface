@@ -21,17 +21,15 @@ def recognition(frame,EncodingCache,known_face_dataset):
 
     Recognition = faceNetRecognition()
 
-    face_locations, face_encodings, positions,image = Recognition . face_locations_encoding(rgb_small_frame)
+    face_locations, face_encodings, positions = Recognition . face_locations_encoding(rgb_small_frame)
 
     # 将人脸编码添加到缓存中
     for face in face_encodings:
         EncodingCache.append(face)
 
-    face_names = []
-    if len(face_locations)>0: #start(EncodingCache, face_encodings):  # 如果达到判断人脸的条件
+    face_names = Recognition.Recognition(rgb_small_frame,EncodingCache,known_face_dataset)
 
-        face_names = Recognition .findPeople(face_encodings,positions,data_set=known_face_dataset)
-
+    if len(face_locations) > 0:
         frame = draw_box(frame, face_locations)
 
     nowTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # 现在
@@ -39,5 +37,5 @@ def recognition(frame,EncodingCache,known_face_dataset):
 
 
 
-    return (frame,face_names,nowTime,image)
+    return (frame,face_names,nowTime)
 
