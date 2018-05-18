@@ -61,6 +61,6 @@ while True:
             result_dict['image']=img_str
             print (result_dict)
             # q.put(result_dict)
-    jump =not  jump
+    jump =not jump
 
 

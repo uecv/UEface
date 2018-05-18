@@ -29,17 +29,18 @@ class config:
     def __init__(self):
 
         faceNetLibroot = faceNetLib.__path__[0]
-        faceNetLibPath = os.path.join(faceNetLibroot,"facerec_128D.txt")  #"./library/faceNetLib/facerec_128D.txt"
+
+        faceNetLibPath =os.path.relpath( os.path.join(faceNetLibroot,"facerec_128D.txt"))
 
         imagesRoot = images.__path__[0]
 
-        face_model_root =  models.__path__[0] #"./Model/faceNet/models/"
+        face_model_root =  models.__path__[0]
 
-        extract_feature_modelpath =   os.path.join(face_model_root,"model-20170512-110547.ckpt-250000")
+        extract_feature_modelpath =  os.path.relpath( os.path.join(face_model_root,"model-20170512-110547.ckpt-250000"))
+
+        face_model_root =os.path.relpath(face_model_root)
 
 
-
-        # extract_feature_modelpath ="./Model/faceNet/models/model-20170512-110547.ckpt-250000"
 
         self._FRGraph = FaceRecGraph()
         self._aligner = AlignCustom()
@@ -75,5 +76,3 @@ class config:
     def getKnown_face_dataset(self):
         return self._known_face_dataset
 
-
-conf = config()
