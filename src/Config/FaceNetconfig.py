@@ -29,17 +29,17 @@ class config:
     def __init__(self):
 
         faceNetLibroot = faceNetLib.__path__[0]
-        faceNetLibPath = "./library/faceNetLib/facerec_128D.txt"  #os.path.join(faceNetLibroot,"facerec_128D.txt")
+        faceNetLibPath = os.path.join(faceNetLibroot,"facerec_128D.txt")  #"./library/faceNetLib/facerec_128D.txt"
 
         imagesRoot = images.__path__[0]
 
-        face_model_root = "./Model/faceNet/models/" #models.__path__[0]
+        face_model_root =  models.__path__[0] #"./Model/faceNet/models/"
 
-        # extract_feature_modelpath =   os.path.join(face_model_root,"model-20170512-110547.ckpt-250000"),'utf-8'
+        extract_feature_modelpath =   os.path.join(face_model_root,"model-20170512-110547.ckpt-250000")
 
 
 
-        extract_feature_modelpath ="./Model/faceNet/models/model-20170512-110547.ckpt-250000"
+        # extract_feature_modelpath ="./Model/faceNet/models/model-20170512-110547.ckpt-250000"
 
         self._FRGraph = FaceRecGraph()
         self._aligner = AlignCustom()
