@@ -1,7 +1,7 @@
 
 from functools import wraps
 
-from src.FaceDetection.mtcnn_detect import MTCNNDetect
+from src.FaceDetection.old_mtcnn_detect import MTCNNDetect
 from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
@@ -23,6 +23,7 @@ def Singleton(cls):
 class config:
 
     def __init__(self):
+        #Todo 拆分
         self._FRGraph = FaceRecGraph()
         self._aligner = AlignCustom()
         self._extract_feature = FaceFeature(

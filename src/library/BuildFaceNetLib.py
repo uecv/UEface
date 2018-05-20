@@ -1,4 +1,4 @@
-
+#coding:utf-8
 
 '''
 创建人脸特征库
@@ -10,10 +10,13 @@ import os
 
 import cv2
 import numpy as np
-from src.Config.FaceNetconfig import config
+from src.Config.old_FaceNetconfig import config
 
 
 class buildLib:
+    """
+    what,how
+    """
     def __init__(self):
         conf = config()
 
@@ -68,7 +71,7 @@ class buildLib:
         f = open('./facerec_128D.txt', 'w')
         f.write(json.dumps(data_set))
 
-
+#Todo
 buildL = buildLib()
 
 buildL.build()

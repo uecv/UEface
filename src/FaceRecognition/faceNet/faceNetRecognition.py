@@ -3,7 +3,7 @@ import sys
 
 import cv2
 import numpy as np
-from src.FaceDetection.MTCNNDetection import MTCNNDetection
+from src.FaceDetection.oldMTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 
 
@@ -19,6 +19,8 @@ class faceNetRecognition:
         初始化人脸检测接口   人脸特征抽取接口
         '''
 
+        #Todo
+        #初始化加载特征库
         self.DetectInterface = MTCNNDetection()
 
         self.FaceFeature = FaceNetExtract()

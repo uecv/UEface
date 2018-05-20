@@ -1,6 +1,6 @@
 
 
-from src.Config.FaceNetconfig import config
+from src.Config.old_FaceNetconfig import config
 
 
 '''

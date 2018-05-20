@@ -1,5 +1,5 @@
 
-from src.Config.FaceNetconfig import config
+from src.Config.old_FaceNetconfig import config
 
 
 '''MTCNN模型  人脸检测类，
@@ -7,6 +7,8 @@ from src.Config.FaceNetconfig import config
 
 
 class MTCNNDetection:
+
+    #Todo config作为传参
 
     def __init__(self):
         con = config()
