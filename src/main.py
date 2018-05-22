@@ -1,13 +1,10 @@
 # coding:utf-8
 
-import base64
-import json
-from io import BytesIO
+
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
 from src.Config.Config import Config
-from PIL import Image
-from src.Config.FaceNetFactory import FaceDetectionFactory
+
 from src.util.redis_queue import RedisQueue
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
