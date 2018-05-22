@@ -20,7 +20,7 @@ def Singleton(cls):
 
 
 @Singleton
-class config:
+class FaceDetectionFactory:
 
     def __init__(self):
         self._FRGraph = FaceRecGraph()

@@ -26,7 +26,7 @@ def recognition(frame, EncodingCache, known_face_dataset):
         EncodingCache.append(face)
 
     face_names = []
-    if face_locations:  # start(EncodingCache, face_encodings):  # 如果达到判断人脸的条件
+    if len(face_locations) >0:  # start(EncodingCache, face_encodings):  # 如果达到判断人脸的条件
 
         face_names = Recognition .findPeople(
             face_encodings, positions, data_set=known_face_dataset)

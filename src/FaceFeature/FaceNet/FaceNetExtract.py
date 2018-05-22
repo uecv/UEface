@@ -1,20 +1,24 @@
 
 
-from src.Config.FaceNetconfig import config
+from src.Config.FaceNetFactory import FaceDetectionFactory
 
 
 '''
 faceNet 模型 人脸特征抽取类
 '''
-
+from src.FaceFeature.FaceNet.align_custom import AlignCustom
+from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
+from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
 
 class FaceNetExtract:
 
-    def __init__(self):
-        conf = config()
+    def __init__(self,conf):
+        FRGraph = FaceRecGraph()
+        self._model = FaceFeature(
+            FRGraph,
+            model_path=conf.get("path","faceNetModel"))
+        self._aligner = AlignCustom()
 
-        self.model = conf.getfaceFeatureModel()
-        self.aligner = conf.getalignerModel()
 
     def Extract(self, image, locations, landmarks):
         '''
@@ -37,7 +41,7 @@ class FaceNetExtract:
         aligns = []
         positions = []
         for (i, rect) in enumerate(rects):
-            aligned_face, face_pos = self.aligner.align(
+            aligned_face, face_pos = self._aligner.align(
                 160, image, landmarks[i])
             if len(aligned_face) == 160 and len(aligned_face[0]) == 160:
                 aligns.append(aligned_face)
@@ -47,6 +51,6 @@ class FaceNetExtract:
 
         features_arr = []
         if aligns:
-            features_arr = self.model.get_features(aligns)
+            features_arr = self._model.get_features(aligns)
 
         return features_arr, positions

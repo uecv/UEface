@@ -10,12 +10,12 @@ import os
 
 import cv2
 import numpy as np
-from src.Config.FaceNetconfig import config
+from src.Config.FaceNetFactory import FaceDetectionFactory
 
 
 class buildLib:
     def __init__(self):
-        conf = config()
+        conf = FaceDetectionFactory()
 
         self.faceFeatureModel = conf.getfaceFeatureModel()
         self.faceDetect = conf.getdetectionModel()
