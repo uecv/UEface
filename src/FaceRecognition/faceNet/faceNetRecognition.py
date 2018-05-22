@@ -3,8 +3,7 @@ import sys
 
 import cv2
 import numpy as np
-from src.FaceDetection.MTCNNDetection import MTCNNDetection
-from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
+from src.FaceRecognition.BaseRecognition import BaseRecognition
 
 
 '''
@@ -12,7 +11,7 @@ faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征�
 '''
 
 
-class faceNetRecognition:
+class faceNetRecognition(BaseRecognition):
 
     def __init__(self):
         '''
@@ -21,7 +20,7 @@ class faceNetRecognition:
         pass
 
 
-    def recognition(self, known_face_dataset, face_encodings, positions ):
+    def Recognit(self, known_face_dataset, face_encodings, positions):
         '''
 
         :param known_face_dataset:  人脸特征库

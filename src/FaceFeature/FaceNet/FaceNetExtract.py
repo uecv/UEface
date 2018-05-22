@@ -10,7 +10,9 @@ from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
 
-class FaceNetExtract:
+from src.FaceFeature.BaseFaceFeature import BaseFaceFeature
+
+class FaceNetExtract(BaseFaceFeature):
 
     def __init__(self,conf):
         FRGraph = FaceRecGraph()

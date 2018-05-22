@@ -7,18 +7,23 @@
 
 from src.FaceDetection.mtcnn_detect import MTCNNDetect
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
-class MTCNNDetection:
+from src.FaceDetection.BaseDetection import BaseDetection
+class MTCNNDetection(BaseDetection):
 
     def __init__(self,conf):
 
+        self.conf =conf
+
+        self.load()
+
+
+
+    def load(self):
         FRGraph = FaceRecGraph()
         self.detectonModel = MTCNNDetect(
             FRGraph,
-            model_path=conf.get("path","mtcnnDeteModel"),
+            model_path=self.conf.get("path", "mtcnnDeteModel"),
             scale_factor=2)
-
-
-
 
 
 

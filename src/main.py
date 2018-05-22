@@ -50,7 +50,7 @@ while True:
         features_arr, positions = faceFeature.Extract(frame,locations, landmarks)
 
         # ** 人脸识别/特征比对
-        face_id = Recognition.recognition(known_face_dataset,features_arr,positions)
+        face_id = Recognition.Recognit(known_face_dataset, features_arr, positions)
 
 
 
