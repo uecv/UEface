@@ -1,0 +1,174 @@
+#!/usr/bin/env python 
+# coding: utf-8 
+""" 
+   @author: kenwood
+   @time: 18-5-22 上午11:53  
+"""
+import pymysql,sys
+from collections import OrderedDict
+
+class MysqlPython:
+    """
+    mysql 操作类，实现crud
+    """
+
+    def __init__(self,host='localhost',user='root',password='',database=''):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+        cnx = pymysql.connect(self.host,self.user,self.password,self.database)
+        self.connection = cnx
+        self.session = cnx.cursor()
+
+    def close(self):
+        self.session.close()
+        self.connection.close()
+
+    def select(self,table,where=None,*args,**kwargs):
+        """
+        查询表
+        :param table:
+        :param where:
+        :param args:表字段
+        :param kwargs:
+        :return:
+        """
+        result = None
+        query = 'SELECT'
+        keys = args
+        values = tuple(kwargs.values())
+        length = len(keys) -1
+        for i,key in enumerate(keys):
+            query += "`" + key + "`"
+            if i < length:
+                query += ","
+
+
+        query += 'FROM %s' % table
+
+        if where:
+            query += " WHERE %s" % where
+            print ('query',query)
+
+
+        self.session.execute(query, values)
+        numberrows = self.session.rowcount
+        numbercolumns = len(self.session.description)
+
+        if numberrows >= 1 and numbercolumns > 1:
+            result = [item for item in self.session.fetchall()]
+        else:
+            result = [item[0] for item in self.session.fetchall()]
+        self.close()
+
+        return result
+
+    def update(self,table,where=None,*args,**kwargs):
+        """
+        更新表
+        :param table:
+        :param where:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        query  = 'UPDATE %s SET' %table
+        keys = kwargs.keys()
+        values = tuple(kwargs.values())+tuple(keys)
+        length = len(keys) -1
+        for i ,key in enumerate(keys):
+            query +="`"+key +"`=%s`"
+            if i <length:
+                query +=","
+
+        query +="WHERE %s"%where
+
+
+        self.session.execute(query,values)
+        self.connection.commit()
+
+        updaterows = self.session.rowcount()
+        self.close()
+        return updaterows
+
+    def insert(self, table, *args, **kwargs):
+        """
+        插入表
+        :param table:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        values = None
+        query = "INSERT INTO %s" % table
+        if kwargs:
+            keys = kwargs.keys()
+            values = tuple(kwargs.values())
+            query += "(" + ",".join(["`%s`"] * len(keys)) % tuple(keys) + ") VALUES (" + ",".join(
+                ["%s"] * len(values)) + ")"
+        elif args:
+            values = args
+            query += " VALUES(" + ",".join(["%s"] * len(values)) + ")"
+
+        self.session.execute(query, values)
+        self.connection.commit()
+        self.close()
+        return self.session.lastrowid
+
+
+
+    def delete(self, table, where=None, *args):
+        """
+        删除表
+        :param table:
+        :param where:
+        :param args:
+        :return:
+        """
+        query = "DELETE FROM %s" % table
+        if where:
+            query += ' WHERE %s' % where
+
+        values = tuple(args)
+
+        self.session.execute(query, values)
+        self.connection.commit()
+
+
+        deleterows = self.session.rowcount
+        self.close()
+
+        return deleterows
+
+
+
+    def selectadvanced(self, sql, *args):
+        """
+        多表关联查询
+        :param sql:
+        :param args:
+        :return:
+        """
+        od = OrderedDict(args)
+        query = sql
+        values = tuple(od.values())
+        self.session.execute(query, values)
+        numberrows = self.session.rowcount
+        numbercolumns = len(self.session.description)
+
+        if numberrows >= 1 and numbercolumns > 1:
+            result = [item for item in self.session.fetchall()]
+        else:
+            result = [item[0] for item in self.session.fetchall()]
+
+        self.close()
+        return result
+
+
+
+if __name__ == '__main__':
+    connectmysql = MysqlPython('localhost', 'root', '', 'mysql')
+    conditionalquery = 'carmake = %s'
+    result = connectmysql.select('car', conditionalquery, 'idcar', 'cartext', carmake='nissan')
+
