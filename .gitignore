@@ -1,0 +1,13 @@
+*/.classpath
+*/.mymetadata
+*/.project
+*.class
+*.settings/
+*.settings/*
+.metadata/
+.metadata/*
+.recommenders/
+.recommenders/*
+*/.idea/
+*/*.iml
+*/target
