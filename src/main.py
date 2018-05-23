@@ -3,11 +3,7 @@
 
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
-
 from PIL import Image
-from src.FaceRecognition import old_faceRecognition
-from src.util.redis_queue import RedisQueue
-
 from src.Config.Config import Config
 from src.util.redis_queue import RedisQueue
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
@@ -60,21 +56,23 @@ while True:
 
 
         # cv2.imshow("test", frame)
+        # cv2.waitKey(0)
         # Hit 'q' on the keyboard to quit!
 
+
         """frame 转图片,base64编码"""
-        img = Image.fromarray(frame, 'RGB')
-        buffered = BytesIO()
-        img.save(buffered, format="JPEG")
-        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-        result_dict = {}
-        if face_names:
-            # import pdb
-            # pdb.set_trace()
-            result_dict['time'] = now_time
-            result_dict['name'] = face_names
-            result_dict['image'] = img_str
-            print(result_dict)
+        # img = Image.fromarray(frame, 'RGB')
+        # buffered = BytesIO()
+        # img.save(buffered, format="JPEG")
+        # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        # result_dict = {}
+        # if face_names:
+        #     # import pdb
+        #     # pdb.set_trace()
+        #     result_dict['time'] = now_time
+        #     result_dict['name'] = face_names
+        #     result_dict['image'] = img_str
+        #     print(result_dict)
             # q.put(result_dict)
 
 
