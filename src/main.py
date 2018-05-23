@@ -3,7 +3,7 @@
 
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
-=
+
 from PIL import Image
 from src.FaceRecognition import old_faceRecognition
 from src.util.redis_queue import RedisQueue

@@ -1,9 +1,5 @@
 
-<<<<<<< HEAD:src/FaceDetection/oldMTCNNDetection.py
-from src.Config.old_FaceNetconfig import config
-=======
 
->>>>>>> sigma:src/FaceDetection/MTCNNDetection.py
 
 
 '''MTCNN模型  人脸检测类，
@@ -30,14 +26,6 @@ class MTCNNDetection(BaseDetection):
             scale_factor=2)
 
 
-<<<<<<< HEAD:src/FaceDetection/oldMTCNNDetection.py
-    #Todo config作为传参
-
-    def __init__(self):
-        con = config()
-        self.detectonModel = con.getdetectionModel()
-=======
->>>>>>> sigma:src/FaceDetection/MTCNNDetection.py
 
     def detect(self, image):
         '''

@@ -10,11 +10,8 @@ import os
 
 import cv2
 import numpy as np
-<<<<<<< HEAD
-from src.Config.old_FaceNetconfig import config
-=======
 from src.Config.FaceNetFactory import FaceDetectionFactory
->>>>>>> sigma
+
 
 
 class buildLib:

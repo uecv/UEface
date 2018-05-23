@@ -1,10 +1,7 @@
 
 
-<<<<<<< HEAD
-from src.Config.old_FaceNetconfig import config
-=======
 from src.Config.FaceNetFactory import FaceDetectionFactory
->>>>>>> sigma
+
 
 
 '''
