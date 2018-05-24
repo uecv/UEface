@@ -1,18 +1,31 @@
 
-from src.Config.old_FaceNetconfig import config
+
 
 
 '''MTCNN模型  人脸检测类，
 '''
 
+from src.FaceDetection.mtcnn_detect import MTCNNDetect
+from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
+from src.FaceDetection.BaseDetection import BaseDetection
+class MTCNNDetection(BaseDetection):
 
-class MTCNNDetection:
+    def __init__(self,conf):
 
-    #Todo config作为传参
+        self.conf =conf
 
-    def __init__(self):
-        con = config()
-        self.detectonModel = con.getdetectionModel()
+        self.load()
+
+
+
+    def load(self):
+        FRGraph = FaceRecGraph()
+        self.detectonModel = MTCNNDetect(
+            FRGraph,
+            model_path=self.conf.get("path", "mtcnnDeteModel"),
+            scale_factor=2)
+
+
 
     def detect(self, image):
         '''

@@ -1,7 +1,7 @@
 #coding:utf-8
 
 import unittest
-from src.FaceDetection.oldMTCNNDetection import MTCNNDetection
+from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from PIL import Image
 
 class MTCNNTest(unittest.TestCase):

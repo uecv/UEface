@@ -10,7 +10,8 @@ import os
 
 import cv2
 import numpy as np
-from src.Config.old_FaceNetconfig import config
+from src.Config.FaceNetFactory import FaceDetectionFactory
+
 
 
 class buildLib:
@@ -18,7 +19,7 @@ class buildLib:
     what,how
     """
     def __init__(self):
-        conf = config()
+        conf = FaceDetectionFactory()
 
         self.faceFeatureModel = conf.getfaceFeatureModel()
         self.faceDetect = conf.getdetectionModel()

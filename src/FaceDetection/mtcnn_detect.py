@@ -3,25 +3,14 @@ Tensorflow implementation of the mtcnn face detection algorithm
 
 Credit: DavidSandBerg for implementing this method on tensorflow
 '''
-import os
-
-import cv2
+from six import string_types, iteritems
 import numpy as np
 import tensorflow as tf
-from six import iteritems, string_types
-
+import cv2
+import os
 
 class MTCNNDetect(object):
-    def __init__(
-            self,
-            face_rec_graph,
-            model_path="models",
-            threshold=[
-                0.6,
-                0.7,
-                0.7],
-            factor=0.709,
-            scale_factor=1):
+    def __init__(self, face_rec_graph, model_path = "models", threshold = [0.6, 0.7, 0.7], factor = 0.709, scale_factor = 1):
         '''
         :param face_rec_sess: FaceRecSession
         :param threshold: detection threshold
@@ -30,7 +19,7 @@ class MTCNNDetect(object):
         '''
         self.threshold = threshold
         self.factor = factor
-        self.scale_factor = scale_factor
+        self.scale_factor = scale_factor;
         with face_rec_graph.graph.as_default():
             print("Loading MTCNN Face detection model")
             self.sess = tf.Session()
@@ -38,8 +27,7 @@ class MTCNNDetect(object):
                 model_path, _ = os.path.split(os.path.realpath(__file__))
 
             with tf.variable_scope('pnet'):
-                data = tf.placeholder(
-                    tf.float32, (None, None, None, 3), 'input')
+                data = tf.placeholder(tf.float32, (None, None, None, 3), 'input')
                 pnet = PNet({'data': data})
                 pnet.load(os.path.join(model_path, 'det1.npy'), self.sess)
             with tf.variable_scope('rnet'):
@@ -51,25 +39,19 @@ class MTCNNDetect(object):
                 onet = ONet({'data': data})
                 onet.load(os.path.join(model_path, 'det3.npy'), self.sess)
 
-            self.pnet = lambda img: self.sess.run(
-                ('pnet/conv4-2/BiasAdd:0', 'pnet/prob1:0'), feed_dict={'pnet/input:0': img})
-            self.rnet = lambda img: self.sess.run(
-                ('rnet/conv5-2/conv5-2:0', 'rnet/prob1:0'), feed_dict={'rnet/input:0': img})
-            self.onet = lambda img: self.sess.run(
-                ('onet/conv6-2/conv6-2:0',
-                 'onet/conv6-3/conv6-3:0',
-                 'onet/prob1:0'),
-                feed_dict={
-                    'onet/input:0': img})
+            self.pnet = lambda img: self.sess.run(('pnet/conv4-2/BiasAdd:0', 'pnet/prob1:0'), feed_dict={'pnet/input:0': img})
+            self.rnet = lambda img: self.sess.run(('rnet/conv5-2/conv5-2:0', 'rnet/prob1:0'), feed_dict={'rnet/input:0': img})
+            self.onet = lambda img: self.sess.run(('onet/conv6-2/conv6-2:0', 'onet/conv6-3/conv6-3:0', 'onet/prob1:0'),
+                                            feed_dict={'onet/input:0': img})
             print("MTCNN Model loaded")
+
+
 
     def detect_face(self, img, minsize):
         # im: input image
         # minsize: minimum of faces' size
-        if self.scale_factor > 1:
-            img = cv2.resize(img,
-                             (int(len(img[0]) / self.scale_factor),
-                              int(len(img) / self.scale_factor)))
+        if(self.scale_factor > 1):
+            img = cv2.resize(img,(int(len(img[0])/self.scale_factor), int(len(img)/self.scale_factor)))
         factor_count = 0
         total_boxes = np.empty((0, 9))
         points = []
@@ -98,8 +80,7 @@ class MTCNNDetect(object):
             out0 = np.transpose(out[0], (0, 2, 1, 3))
             out1 = np.transpose(out[1], (0, 2, 1, 3))
 
-            boxes, _ = generateBoundingBox(out1[0, :, :, 1].copy(
-            ), out0[0, :, :, :].copy(), scale, self.threshold[0])
+            boxes, _ = generateBoundingBox(out1[0, :, :, 1].copy(), out0[0, :, :, :].copy(), scale, self.threshold[0])
 
             # inter-scale nms
             pick = nms(boxes.copy(), 0.5, 'Union')
@@ -117,12 +98,10 @@ class MTCNNDetect(object):
             qq2 = total_boxes[:, 1] + total_boxes[:, 6] * regh
             qq3 = total_boxes[:, 2] + total_boxes[:, 7] * regw
             qq4 = total_boxes[:, 3] + total_boxes[:, 8] * regh
-            total_boxes = np.transpose(
-                np.vstack([qq1, qq2, qq3, qq4, total_boxes[:, 4]]))
+            total_boxes = np.transpose(np.vstack([qq1, qq2, qq3, qq4, total_boxes[:, 4]]))
             total_boxes = rerec(total_boxes.copy())
             total_boxes[:, 0:4] = np.fix(total_boxes[:, 0:4]).astype(np.int32)
-            dy, edy, dx, edx, y, ey, x, ex, tmpw, tmph = pad(
-                total_boxes.copy(), w, h)
+            dy, edy, dx, edx, y, ey, x, ex, tmpw, tmph = pad(total_boxes.copy(), w, h)
 
         numbox = total_boxes.shape[0]
         if numbox > 0:
@@ -130,8 +109,7 @@ class MTCNNDetect(object):
             tempimg = np.zeros((24, 24, 3, numbox))
             for k in range(0, numbox):
                 tmp = np.zeros((int(tmph[k]), int(tmpw[k]), 3))
-                tmp[dy[k] - 1:edy[k], dx[k] - 1:edx[k],
-                    :] = img[y[k] - 1:ey[k], x[k] - 1:ex[k], :]
+                tmp[dy[k] - 1:edy[k], dx[k] - 1:edx[k], :] = img[y[k] - 1:ey[k], x[k] - 1:ex[k], :]
                 if tmp.shape[0] > 0 and tmp.shape[1] > 0 or tmp.shape[0] == 0 and tmp.shape[1] == 0:
                     tempimg[:, :, :, k] = imresample(tmp, (24, 24))
                 else:
@@ -143,27 +121,23 @@ class MTCNNDetect(object):
             out1 = np.transpose(out[1])
             score = out1[1, :]
             ipass = np.where(score > self.threshold[1])
-            total_boxes = np.hstack(
-                [total_boxes[ipass[0], 0:4].copy(), np.expand_dims(score[ipass].copy(), 1)])
+            total_boxes = np.hstack([total_boxes[ipass[0], 0:4].copy(), np.expand_dims(score[ipass].copy(), 1)])
             mv = out0[:, ipass[0]]
             if total_boxes.shape[0] > 0:
                 pick = nms(total_boxes, 0.7, 'Union')
                 total_boxes = total_boxes[pick, :]
-                total_boxes = bbreg(total_boxes.copy(),
-                                    np.transpose(mv[:, pick]))
+                total_boxes = bbreg(total_boxes.copy(), np.transpose(mv[:, pick]))
                 total_boxes = rerec(total_boxes.copy())
 
         numbox = total_boxes.shape[0]
         if numbox > 0:
             # third stage
             total_boxes = np.fix(total_boxes).astype(np.int32)
-            dy, edy, dx, edx, y, ey, x, ex, tmpw, tmph = pad(
-                total_boxes.copy(), w, h)
+            dy, edy, dx, edx, y, ey, x, ex, tmpw, tmph = pad(total_boxes.copy(), w, h)
             tempimg = np.zeros((48, 48, 3, numbox))
             for k in range(0, numbox):
                 tmp = np.zeros((int(tmph[k]), int(tmpw[k]), 3))
-                tmp[dy[k] - 1:edy[k], dx[k] - 1:edx[k],
-                    :] = img[y[k] - 1:ey[k], x[k] - 1:ex[k], :]
+                tmp[dy[k] - 1:edy[k], dx[k] - 1:edx[k], :] = img[y[k] - 1:ey[k], x[k] - 1:ex[k], :]
                 if tmp.shape[0] > 0 and tmp.shape[1] > 0 or tmp.shape[0] == 0 and tmp.shape[1] == 0:
                     tempimg[:, :, :, k] = imresample(tmp, (48, 48))
                 else:
@@ -178,31 +152,22 @@ class MTCNNDetect(object):
             points = out1
             ipass = np.where(score > self.threshold[2])
             points = points[:, ipass[0]]
-            total_boxes = np.hstack(
-                [total_boxes[ipass[0], 0:4].copy(), np.expand_dims(score[ipass].copy(), 1)])
+            total_boxes = np.hstack([total_boxes[ipass[0], 0:4].copy(), np.expand_dims(score[ipass].copy(), 1)])
             mv = out0[:, ipass[0]]
 
             w = total_boxes[:, 2] - total_boxes[:, 0] + 1
             h = total_boxes[:, 3] - total_boxes[:, 1] + 1
-            points[0:5, :] = np.tile(
-                w, (5, 1)) * points[0:5, :] + np.tile(total_boxes[:, 0], (5, 1)) - 1
-            points[5:10, :] = np.tile(
-                h, (5, 1)) * points[5:10, :] + np.tile(total_boxes[:, 1], (5, 1)) - 1
+            points[0:5, :] = np.tile(w, (5, 1)) * points[0:5, :] + np.tile(total_boxes[:, 0], (5, 1)) - 1
+            points[5:10, :] = np.tile(h, (5, 1)) * points[5:10, :] + np.tile(total_boxes[:, 1], (5, 1)) - 1
             if total_boxes.shape[0] > 0:
                 total_boxes = bbreg(total_boxes.copy(), np.transpose(mv))
                 pick = nms(total_boxes.copy(), 0.7, 'Min')
                 total_boxes = total_boxes[pick, :]
                 points = points[:, pick]
-        # points is stored in a very weird datastructure, this transpose it to
-        # process eaiser
-        simple_points = np.transpose(points)
-        rects = [(max(0, (int(rect[0]))) *
-                  self.scale_factor, max(0, int(rect[1])) *
-                  self.scale_factor, int(rect[2] -
-                                         rect[0]) *
-                  self.scale_factor, int(rect[3] -
-                                         rect[1]) *
-                  self.scale_factor) for rect in total_boxes]
+        simple_points = np.transpose(
+            points)  # points is stored in a very weird datastructure, this transpose it to process eaiser
+        rects = [(max(0,(int(rect[0]))) * self.scale_factor,max(0,int(rect[1])) * self.scale_factor,
+                          int(rect[2] - rect[0]) * self.scale_factor,int(rect[3] - rect[1]) * self.scale_factor) for rect in total_boxes]
         return rects, simple_points * self.scale_factor
 
 
@@ -230,7 +195,6 @@ def layer(op):
 
     return layer_decorated
 
-
 class Network(object):
 
     def __init__(self, inputs, trainable=True):
@@ -255,9 +219,7 @@ class Network(object):
         session: The current TensorFlow session
         ignore_missing: If true, serialized weights for missing layers are ignored.
         '''
-        data_dict = np.load(
-            data_path,
-            encoding='latin1').item()  # pylint: disable=no-member
+        data_dict = np.load(data_path, encoding='latin1').item()  # pylint: disable=no-member
 
         for op_name in data_dict:
             with tf.variable_scope(op_name, reuse=True):
@@ -324,15 +286,10 @@ class Network(object):
         assert c_i % group == 0
         assert c_o % group == 0
         # Convolution for a given input and kernel
-
-        def convolve(i, k): return tf.nn.conv2d(
-            i, k, [1, s_h, s_w, 1], padding=padding)
+        convolve = lambda i, k: tf.nn.conv2d(i, k, [1, s_h, s_w, 1], padding=padding)
         with tf.variable_scope(name) as scope:
-            kernel = self.make_var(
-                'weights', shape=[
-                    k_h, k_w, c_i // group, c_o])
-            # This is the common-case. Convolve the input without any further
-            # complications.
+            kernel = self.make_var('weights', shape=[k_h, k_w, c_i // group, c_o])
+            # This is the common-case. Convolve the input without any further complications.
             output = convolve(inp, kernel)
             # Add the biases
             if biased:
@@ -393,66 +350,65 @@ class Network(object):
         softmax = tf.div(target_exp, normalize, name)
         return softmax
 
+class PNet(Network):
+    def setup(self):
+        (self.feed('data')  # pylint: disable=no-value-for-parameter, no-member
+         .conv(3, 3, 10, 1, 1, padding='VALID', relu=False, name='conv1')
+         .prelu(name='PReLU1')
+         .max_pool(2, 2, 2, 2, name='pool1')
+         .conv(3, 3, 16, 1, 1, padding='VALID', relu=False, name='conv2')
+         .prelu(name='PReLU2')
+         .conv(3, 3, 32, 1, 1, padding='VALID', relu=False, name='conv3')
+         .prelu(name='PReLU3')
+         .conv(1, 1, 2, 1, 1, relu=False, name='conv4-1')
+         .softmax(3, name='prob1'))
 
-    class PNet(Network):
-        def setup(self):
-            (self.feed('data')  # pylint: disable=no-value-for-parameter, no-member
-             .conv(3, 3, 10, 1, 1, padding='VALID', relu=False, name='conv1')
-             .prelu(name='PReLU1')
-             .max_pool(2, 2, 2, 2, name='pool1')
-             .conv(3, 3, 16, 1, 1, padding='VALID', relu=False, name='conv2')
-             .prelu(name='PReLU2')
-             .conv(3, 3, 32, 1, 1, padding='VALID', relu=False, name='conv3')
-             .prelu(name='PReLU3')
-             .conv(1, 1, 2, 1, 1, relu=False, name='conv4-1')
-             .softmax(3, name='prob1'))
+        (self.feed('PReLU3')  # pylint: disable=no-value-for-parameter
+         .conv(1, 1, 4, 1, 1, relu=False, name='conv4-2'))
 
-            (self.feed('PReLU3')  # pylint: disable=no-value-for-parameter
-             .conv(1, 1, 4, 1, 1, relu=False, name='conv4-2'))
+class RNet(Network):
+    def setup(self):
+        (self.feed('data')  # pylint: disable=no-value-for-parameter, no-member
+         .conv(3, 3, 28, 1, 1, padding='VALID', relu=False, name='conv1')
+         .prelu(name='prelu1')
+         .max_pool(3, 3, 2, 2, name='pool1')
+         .conv(3, 3, 48, 1, 1, padding='VALID', relu=False, name='conv2')
+         .prelu(name='prelu2')
+         .max_pool(3, 3, 2, 2, padding='VALID', name='pool2')
+         .conv(2, 2, 64, 1, 1, padding='VALID', relu=False, name='conv3')
+         .prelu(name='prelu3')
+         .fc(128, relu=False, name='conv4')
+         .prelu(name='prelu4')
+         .fc(2, relu=False, name='conv5-1')
+         .softmax(1, name='prob1'))
 
-    class RNet(Network):
-        def setup(self):
-            (self.feed('data')  # pylint: disable=no-value-for-parameter, no-member
-             .conv(3, 3, 28, 1, 1, padding='VALID', relu=False, name='conv1')
-             .prelu(name='prelu1')
-             .max_pool(3, 3, 2, 2, name='pool1')
-             .conv(3, 3, 48, 1, 1, padding='VALID', relu=False, name='conv2')
-             .prelu(name='prelu2')
-             .max_pool(3, 3, 2, 2, padding='VALID', name='pool2')
-             .conv(2, 2, 64, 1, 1, padding='VALID', relu=False, name='conv3')
-             .prelu(name='prelu3')
-             .fc(128, relu=False, name='conv4')
-             .prelu(name='prelu4')
-             .fc(2, relu=False, name='conv5-1')
-             .softmax(1, name='prob1'))
+        (self.feed('prelu4')  # pylint: disable=no-value-for-parameter
+         .fc(4, relu=False, name='conv5-2'))
 
-            (self.feed('prelu4')  # pylint: disable=no-value-for-parameter
-             .fc(4, relu=False, name='conv5-2'))
+class ONet(Network):
+    def setup(self):
+        (self.feed('data')  # pylint: disable=no-value-for-parameter, no-member
+         .conv(3, 3, 32, 1, 1, padding='VALID', relu=False, name='conv1')
+         .prelu(name='prelu1')
+         .max_pool(3, 3, 2, 2, name='pool1')
+         .conv(3, 3, 64, 1, 1, padding='VALID', relu=False, name='conv2')
+         .prelu(name='prelu2')
+         .max_pool(3, 3, 2, 2, padding='VALID', name='pool2')
+         .conv(3, 3, 64, 1, 1, padding='VALID', relu=False, name='conv3')
+         .prelu(name='prelu3')
+         .max_pool(2, 2, 2, 2, name='pool3')
+         .conv(2, 2, 128, 1, 1, padding='VALID', relu=False, name='conv4')
+         .prelu(name='prelu4')
+         .fc(256, relu=False, name='conv5')
+         .prelu(name='prelu5')
+         .fc(2, relu=False, name='conv6-1')
+         .softmax(1, name='prob1'))
 
-    class ONet(Network):
-        def setup(self):
-            (self.feed('data')  # pylint: disable=no-value-for-parameter, no-member
-             .conv(3, 3, 32, 1, 1, padding='VALID', relu=False, name='conv1')
-             .prelu(name='prelu1')
-             .max_pool(3, 3, 2, 2, name='pool1')
-             .conv(3, 3, 64, 1, 1, padding='VALID', relu=False, name='conv2')
-             .prelu(name='prelu2')
-             .max_pool(3, 3, 2, 2, padding='VALID', name='pool2')
-             .conv(3, 3, 64, 1, 1, padding='VALID', relu=False, name='conv3')
-             .prelu(name='prelu3')
-             .max_pool(2, 2, 2, 2, name='pool3')
-             .conv(2, 2, 128, 1, 1, padding='VALID', relu=False, name='conv4')
-             .prelu(name='prelu4')
-             .fc(256, relu=False, name='conv5')
-             .prelu(name='prelu5')
-             .fc(2, relu=False, name='conv6-1')
-             .softmax(1, name='prob1'))
+        (self.feed('prelu5')  # pylint: disable=no-value-for-parameter
+         .fc(4, relu=False, name='conv6-2'))
 
-            (self.feed('prelu5')  # pylint: disable=no-value-for-parameter
-             .fc(4, relu=False, name='conv6-2'))
-
-            (self.feed('prelu5')  # pylint: disable=no-value-for-parameter
-             .fc(10, relu=False, name='conv6-3'))
+        (self.feed('prelu5')  # pylint: disable=no-value-for-parameter
+         .fc(10, relu=False, name='conv6-3'))
 
 
 # function [boundingbox] = bbreg(boundingbox,reg)
@@ -469,7 +425,6 @@ def bbreg(boundingbox, reg):
     b4 = boundingbox[:, 3] + reg[:, 3] * h
     boundingbox[:, 0:4] = np.transpose(np.vstack([b1, b2, b3, b4]))
     return boundingbox
-
 
 def generateBoundingBox(imap, reg, scale, t):
     # use heatmap to generate bounding boxes
@@ -488,8 +443,7 @@ def generateBoundingBox(imap, reg, scale, t):
         dx2 = np.flipud(dx2)
         dy2 = np.flipud(dy2)
     score = imap[(y, x)]
-    reg = np.transpose(
-        np.vstack([dx1[(y, x)], dy1[(y, x)], dx2[(y, x)], dy2[(y, x)]]))
+    reg = np.transpose(np.vstack([dx1[(y, x)], dy1[(y, x)], dx2[(y, x)], dy2[(y, x)]]))
     if reg.size == 0:
         reg = np.empty((0, 3))
     bb = np.transpose(np.vstack([y, x]))
@@ -499,8 +453,6 @@ def generateBoundingBox(imap, reg, scale, t):
     return boundingbox, reg
 
 # function pick = nms(boxes,threshold,type)
-
-
 def nms(boxes, threshold, method):
     if boxes.size == 0:
         return np.empty((0, 3))
@@ -534,8 +486,6 @@ def nms(boxes, threshold, method):
     return pick
 
 # function [dy edy dx edx y ey x ex tmpw tmph] = pad(total_boxes,w,h)
-
-
 def pad(total_boxes, w, h):
     # compute the padding coordinates (pad the bounding boxes to square)
     tmpw = (total_boxes[:, 2] - total_boxes[:, 0] + 1).astype(np.int32)
@@ -571,8 +521,6 @@ def pad(total_boxes, w, h):
     return dy, edy, dx, edx, y, ey, x, ex, tmpw, tmph
 
 # function [bboxA] = rerec(bboxA)
-
-
 def rerec(bboxA):
     # convert bboxA to square
     h = bboxA[:, 3] - bboxA[:, 1]
@@ -583,8 +531,6 @@ def rerec(bboxA):
     bboxA[:, 2:4] = bboxA[:, 0:2] + np.transpose(np.tile(l, (2, 1)))
     return bboxA
 
-
 def imresample(img, sz):
-    # @UndefinedVariable
-    im_data = cv2.resize(img, (sz[1], sz[0]), interpolation=cv2.INTER_AREA)
+    im_data = cv2.resize(img, (sz[1], sz[0]), interpolation=cv2.INTER_AREA)  # @UndefinedVariable
     return im_data
