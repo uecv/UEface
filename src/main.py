@@ -91,16 +91,37 @@ while True:
 
         result_dict = {}
         time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        for (id, simi) in face_id[0]:
+        for (id_simi,location) in zip(face_id[0],locations):
+
+            id,simi = id_simi
 
             if id in CACHE:
                 continue
 
+            #  location  [ymin, xmin, ymax, xmax]
+            ymax = location[0]
+
+            xmin = location[1]
+
+            ymin = location[2]
+
+            xmax = location[3]
+
+            head = frame[xmin:xmax,ymin:ymax,0:3]
+            head_img = Image.fromarray(head, 'RGB')
+            buffered = BytesIO()
+            head_img.save(buffered, format="JPEG")
+            img_head_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+            # cv2.imshow("test", head_img)
+            # cv2.waitKey(0)
+
+
             CACHE.add(id)
             result_dict['ts'] = time
             result_dict['name'] = id  # list
-            result_dict['image'] = img_str  # list
-            result_dict['raw_image'] = img_str  # list
+            result_dict['image'] = img_head_str  # list
+            result_dict['raw_image'] = img_head_str  # list
             result_dict['similarity'] = simi  # list
             print(result_dict)
             q.put(result_dict)
