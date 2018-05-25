@@ -34,9 +34,13 @@ def insert_people(people):
         cus.close()
         con.close()
 
+
+
+
 if __name__ == '__main__':
-    f = open("11.png","rb")
-    x = f.read()
-    f.close()
-    people = People("test",x)
-    insert_people(people)
+    for i in range(5):
+        f = open("11.png","rb")
+        x = f.read()
+        f.close()
+        people = People("test",x)
+        insert_people(people)

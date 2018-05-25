@@ -32,3 +32,7 @@ class RedisQueue(object):
         # 直接返回队列第一个元素，如果队列为空返回的是None
         item = self.__db.lpop(self.key)
         return item
+
+
+
+
