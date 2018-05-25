@@ -23,10 +23,12 @@ class BaseDetection():
         """
         pass
 
-    def detect(self,frame):
-        """
-        检测人脸
-        :param frame:
-        :return:
-        """
-        pass
+
+    def detect(self, image):
+            '''
+            人脸检测接口
+            :param images:
+            :return: 返回照片中人脸的位置 ,以及特征点
+            '''
+            pass
+

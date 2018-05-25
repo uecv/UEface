@@ -5,7 +5,6 @@ import cv2
 import numpy as np
 from src.FaceRecognition.BaseRecognition import BaseRecognition
 
-
 '''
 faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征抽取等
 '''
@@ -18,6 +17,7 @@ class faceNetRecognition(BaseRecognition):
         初始化人脸检测接口   人脸特征抽取接口
         '''
         pass
+
 
 
     def Recognit(self, known_face_dataset, face_encodings, positions):

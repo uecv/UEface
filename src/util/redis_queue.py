@@ -13,10 +13,12 @@ class RedisQueue(object):
        self.key = '%s:%s' %(namespace, name)
 
     def qsize(self):
-        return self.__db.llen(self.key)  # 返回队列里面list内元素的数量
+        # 返回队列里面list内元素的数量
+        return self.__db.llen(self.key)
 
     def put(self, item):
-        self.__db.rpush(self.key, item)  # 添加新元素到队列最右方
+        # 添加新元素到队列最右方
+        self.__db.rpush(self.key, item)
 
     def get_wait(self, timeout=None):
         # 返回队列第一个元素，如果为空则等待至有元素被加入队列（超时时间阈值为timeout，如果为None则一直等待）

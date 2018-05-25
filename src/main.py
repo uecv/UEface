@@ -3,8 +3,8 @@
 
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
+from PIL import Image
 from src.Config.Config import Config
-
 from src.util.redis_queue import RedisQueue
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
@@ -15,8 +15,6 @@ video_capture = cv2.VideoCapture(0)
 
 
 
-
-# 配置文件对象
 conf = Config("./Config/config.ini")
 
 # ** 构建人脸特征库对象
@@ -34,8 +32,10 @@ jump = True
 while True:
     if jump:
 
+
         # 获取一帧视频
         ret, frame = video_capture.read()
+        #Todo 判断那一帧进入识别流程
 
 
         # 人脸检测:
@@ -54,10 +54,27 @@ while True:
 
         print(face_id)
 
-        cv2.imshow("test", frame)
+
+        # cv2.imshow("test", frame)
+        # cv2.waitKey(0)
         # Hit 'q' on the keyboard to quit!
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        # continue
+
+
+        """frame 转图片,base64编码"""
+        # img = Image.fromarray(frame, 'RGB')
+        # buffered = BytesIO()
+        # img.save(buffered, format="JPEG")
+        # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        # result_dict = {}
+        # if face_names:
+        #     # import pdb
+        #     # pdb.set_trace()
+        #     result_dict['time'] = now_time
+        #     result_dict['name'] = face_names
+        #     result_dict['image'] = img_str
+        #     print(result_dict)
+            # q.put(result_dict)
+
 
     jump = not jump
+
