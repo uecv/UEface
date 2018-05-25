@@ -1,6 +1,6 @@
 
 
-from src.Config.FaceNetFactory import FaceDetectionFactory
+
 
 
 '''
