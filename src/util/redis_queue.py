@@ -5,6 +5,7 @@
    @time: 18-5-11 下午7:20  
 """
 import redis
+
 from src.storage.mysql_pool import MysqlPool
 
 pool = MysqlPool()
@@ -12,8 +13,9 @@ pool = MysqlPool()
 class RedisQueue(object):
     def __init__(self, name, namespace='queue', **redis_kwargs):
        # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
-       self.__db= redis.Redis(**redis_kwargs)
+       self.__db = redis.Redis(**redis_kwargs)
        self.key = '%s:%s' %(namespace, name)
+       self.pre_load()
 
 
     def qsize(self):
@@ -37,6 +39,7 @@ class RedisQueue(object):
         return item
 
 
-    def pre_load(self):
-        #
+
+
+
 

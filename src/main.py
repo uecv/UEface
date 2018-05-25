@@ -3,12 +3,20 @@
 
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
+import datetime
 from PIL import Image
 from src.Config.Config import Config
 from src.util.redis_queue import RedisQueue
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
+import  base64
+from io import  BytesIO
+
+from src.service import  recoginiton as recoginitionDB
+
+from src.service import  camframe as camframeDB
+
 q = RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
 video_capture = cv2.VideoCapture(0)
@@ -35,6 +43,7 @@ while True:
 
         # 获取一帧视频
         ret, frame = video_capture.read()
+        saveframe = frame
         #Todo 判断那一帧进入识别流程
 
 
@@ -50,30 +59,41 @@ while True:
         face_id = Recognition.Recognit(known_face_dataset, features_arr, positions)
 
 
+        #
+        # cam = camframeDB.Camframe(1,saveframe)
+        # camframeDB.insert_camframe(cam)
 
+        # for id in face_id:
+        #     if id !="Unknown":
+        #         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        #         reco = recoginitionDB.Recoginition(saveframe,1,cam.id,id,dt)
+        #         recoginitionDB.insert_result(reco)
 
-        print(face_id)
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-
-        # cv2.imshow("test", frame)
-        # cv2.waitKey(0)
+        cv2.imshow("test", frame)
+        cv2.waitKey(0)
         # Hit 'q' on the keyboard to quit!
 
 
         """frame 转图片,base64编码"""
-        # img = Image.fromarray(frame, 'RGB')
-        # buffered = BytesIO()
-        # img.save(buffered, format="JPEG")
-        # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-        # result_dict = {}
-        # if face_names:
-        #     # import pdb
-        #     # pdb.set_trace()
-        #     result_dict['time'] = now_time
-        #     result_dict['name'] = face_names
-        #     result_dict['image'] = img_str
-        #     print(result_dict)
-            # q.put(result_dict)
+        img = Image.fromarray(frame, 'RGB')
+
+
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        result_dict = {}
+        if face_id:
+            # import pdb
+            # pdb.set_trace()
+            result_dict['ts'] = time
+            result_dict['name'] = face_id[0]
+            result_dict['image'] = img_str
+            result_dict['raw_image'] = img_str
+            result_dict['similarity'] = face_id[1]
+            print(result_dict)
+            q.put(result_dict)
 
 
     jump = not jump
