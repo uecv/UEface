@@ -34,3 +34,6 @@ def insert_camera(camera):
     finally:
         cus.close()
         con.close()
+
+
+if __name__ == '__main__':
