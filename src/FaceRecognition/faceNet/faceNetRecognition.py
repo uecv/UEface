@@ -87,7 +87,7 @@ class faceNetRecognition(BaseRecognition):
             positions,
             data_set=None,
             thres=0.6,
-            percent_thres=85):
+            percent_thres=58):
         '''
         :param features_arr: a list of 128d Features of all faces on screen
         :param positions: a list of face position types of all faces on screen
