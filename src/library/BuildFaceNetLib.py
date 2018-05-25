@@ -7,11 +7,12 @@
 
 import json
 import os
-
 import cv2
 import numpy as np
 from src.Config.FaceNetFactory import FaceDetectionFactory
-
+from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
+from src.Config.Config import Config
+from src.FaceDetection.MTCNNDetection import MTCNNDetection
 
 
 class buildLib:
@@ -25,7 +26,6 @@ class buildLib:
         self.faceDetect = conf.getdetectionModel()
         self.alignerModel = conf.getalignerModel()
 
-        self.faceNetLibPath = conf.getFaceNetLibPath()
 
         self.imagesPath = conf.getImagePath()
 
@@ -72,7 +72,20 @@ class buildLib:
         f = open('./facerec_128D.txt', 'w')
         f.write(json.dumps(data_set))
 
-#Todo
-buildL = buildLib()
 
-buildL.build()
+if __name__ == '__main__':
+
+    conf = Config("./Config/config.ini")
+
+    # ** 构建人脸特征库对象
+
+    faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
+
+    faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
+    
+
+
+
+    buildL = buildLib()
+
+    buildL.build()
