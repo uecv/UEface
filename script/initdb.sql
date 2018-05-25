@@ -2,7 +2,7 @@ create database ueface;
 
 create table people
 (
-id int primary key AUTO_INCREMENT comment '主键',
+id varchar(36) primary key not null comment '主键',
 name VARCHAR(20) not null comment '名称',
 imagebytes MEDIUMBLOB not null comment '图片的二进制数据',
 create_time DATETIME DEFAULT CURRENT_TIMESTAMP comment '创建时间',
@@ -34,7 +34,7 @@ description VARCHAR(100)  comment '备注'
 
 create table camframe
 (
-id int primary key AUTO_INCREMENT comment '主键',
+id varchar(36) primary key comment 'uuid,主键',
 cam_id int not null comment '外键,摄像头ID',
 framebytes MEDIUMBLOB not null comment '帧的二进制数据',
 create_time DATETIME DEFAULT CURRENT_TIMESTAMP  comment '创建时间',
@@ -43,7 +43,7 @@ description VARCHAR(100)  comment '备注'
 
 create table recognition
 (
-id int primary key AUTO_INCREMENT comment '主键',
+id varchar(36) primary key comment 'uuid,主键',
 cap_img MEDIUMBLOB not null comment '从帧中扣出的头像',
 cam_id int not null comment  '外键,摄像头ID',
 frame_id int not null comment '外建,所属帧ID',
