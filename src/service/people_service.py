@@ -9,12 +9,20 @@ import MySQLdb
 # 获取MysqlPool对象
 pool = MysqlPool()
 
-def insert_people(name,imagebytes):
+
+class People():
+    def __init__(self,name,frame):
+        self.name = name
+        self.frame = frame
+
+
+
+def insert_people(people):
     con = pool.getConnection()
     cus = con.cursor()
     try:
         people_sql = "insert into people(name,imagebytes) values (%s,%s)"
-        args = (name,MySQLdb.Binary(imagebytes))
+        args = (people.name,MySQLdb.Binary(people.frame))
         cus.execute(people_sql,args)             # 执行SQL语句
         con.commit()  # 如果执行成功就提交事务
     except Exception as e:

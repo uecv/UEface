@@ -8,6 +8,9 @@ from src.storage.mysql_pool import MysqlPool
 pool = MysqlPool()
 
 
+
+
+
 def get_nums(cam_id):
     """
     通过摄像头id获取今日已检测人数
@@ -23,6 +26,11 @@ def get_nums(cam_id):
     cur.close()  # or del cur
     db.close()  # or del db
     return count
+
+
+
+
+
 
 
 if __name__ == '__main__':
