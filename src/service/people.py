@@ -36,22 +36,8 @@ def insert_people(people):
         con.close()
 
 if __name__ == '__main__':
-
-    im1 = cv2.imread("sigma_2.png")
-
-    #
-    # im2 = cv2.imread("11.png")
-
-    # f = open("11.png",'rb')
-    # da1 = f.read()
-    # f.close()
-
-    # f = open("sigma_2.png", 'rb')
-    # da2 = f.read()
-    # f.close()
-
-
-
-    for i in range(5):
-        people = People("sigma_cv2_byteraary",im1)
-        insert_people(people)
+    f = open("11.png","rb")
+    x = f.read()
+    f.close()
+    people = People("test",x)
+    insert_people(people)
