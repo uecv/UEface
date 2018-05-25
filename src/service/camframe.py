@@ -7,6 +7,7 @@
 from src.storage.mysql_pool import MysqlPool
 import MySQLdb
 import uuid
+import cv2
 # 获取MysqlPool对象
 pool = MysqlPool()
 
@@ -38,8 +39,12 @@ def insert_camframe(camframe):
         con.close()
 
 if __name__ == '__main__':
-    f = open("11.png","rb")
-    x = f.read()
-    f.close()
-    camframe = Camframe(2,x)
-    insert_camframe(camframe)
+    # f = open("11.png","rb")
+    # x = f.read()
+    # f.close()
+
+    x = cv2.imread("sigma_2.png")
+
+    for i in range(5):
+        camframe = Camframe(2,x)
+        insert_camframe(camframe)

@@ -86,7 +86,7 @@ class faceNetRecognition(BaseRecognition):
             features_arr,
             positions,
             data_set=None,
-            thres=0.6,
+            thres=0.7,
             percent_thres=58):
         '''
         :param features_arr: a list of 128d Features of all faces on screen
@@ -113,4 +113,6 @@ class faceNetRecognition(BaseRecognition):
             if percentage <= percent_thres:
                 result = "Unknown"
             returnRes.append((result, percentage))
-        return returnRes
+
+
+        return returnRes,

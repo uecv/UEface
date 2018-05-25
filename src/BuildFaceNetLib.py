@@ -12,7 +12,7 @@ from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.Config.Config import Config
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 import  numpy
-
+from src.service import people as perpleDB
 
 class NPEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -49,18 +49,22 @@ class buildLib:
             data_set = json.loads(data)
 
 
-
-        person_features = {"Left": [], "Right": [], "Center": []}
-
         images = os.listdir(self.imagesPath)
 
         for name_id in images:
+
+
 
             name, id = name_id.split("_")
 
             imagepath = os.path.join(self.imagesPath,name_id)
 
             im = cv2.imread(imagepath)
+
+
+            people = perpleDB.People(name,im )
+            perpleDB.insert_people(people)
+
 
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
@@ -70,12 +74,12 @@ class buildLib:
             # features_arr：人脸特征    positions：人脸姿态
             features_arr, positions = faceFeature.Extract(im, locations, landmarks)
 
-
+            person_features = {"Left": [], "Right": [], "Center": []}
 
             for pos in person_features:
                 person_features[pos] = features_arr
 
-            data_set[id] = person_features
+            data_set[people.id] = person_features
 
 
         f = open(self.libraryPath, 'w')
