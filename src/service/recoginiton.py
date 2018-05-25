@@ -3,13 +3,29 @@
    @author: wy
    @time: 2018/5/23 0023
 """
+import uuid
 from src.storage.mysql_pool import MysqlPool
+import MySQLdb
+import datetime
 # 获取MysqlPool对象
 pool = MysqlPool()
 
 
-
-
+class Recoginition():
+    def __init__(self,cap_img,cam_id,frame_id,user_id,cap_time):
+        """
+        :param cap_img: 从帧中扣出的头像
+        :param cam_id: 外键,摄像头ID
+        :param frame_id: 外建,所属帧ID
+        :param user_id: 外键,该头像识别得到的人id
+        :param cap_time: 被捕捉到的时间
+        """
+        self.id = str(uuid.uuid1())
+        self.cap_img = cap_img
+        self.cam_id = cam_id
+        self.frame_id = frame_id
+        self.user_id = user_id
+        self.cap_time = cap_time
 
 def get_nums(cam_id):
     """
@@ -27,13 +43,40 @@ def get_nums(cam_id):
     db.close()  # or del db
     return count
 
-
+def insert_result(reco):
+    con = pool.getConnection()
+    cus = con.cursor()
+    try:
+        sql = "insert into recognition(id,cap_img,cam_id,frame_id,user_id,cap_time) values (%s,%s,%s,%s,%s,%s)"
+        args = (reco.id,
+                MySQLdb.Binary(reco.cap_img),
+                reco.cam_id,
+                reco.frame_id,
+                reco.user_id,
+                reco.cap_time)
+        cus.execute(sql,args)             # 执行SQL语句
+        con.commit()  # 如果执行成功就提交事务
+    except Exception as e:
+        con.rollback()                 # 如果执行失败就回滚事务
+        raise e
+    finally:
+        cus.close()
+        con.close()
 
 
 
 
 
 if __name__ == '__main__':
+    # 获取今日统计人数测试
     print(get_nums(1))
+
+    # 测试写入识别结果
+    f = open("11.png","rb")
+    x = f.read()
+    f.close()
+    dt=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    reco = Recoginition(x,1,1,1,dt)
+    insert_result(reco)
 
 

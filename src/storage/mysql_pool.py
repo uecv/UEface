@@ -23,7 +23,7 @@ class MysqlPool:
     """
     def __init__(self):
         #Todo 修改读配置文件
-        self.pool = PooledDB(pymysql,50,host='192.168.0.245',user='root',passwd='ueface',db='ueface',port=3306,charset="utf8") #5为连接池里的最少连接数
+        self.pool = PooledDB(pymysql,2,host='192.168.0.245',user='root',passwd='ueface',db='ueface',port=3306,charset="utf8") #5为连接池里的最少连接数
 
 
     def getConnection(self):

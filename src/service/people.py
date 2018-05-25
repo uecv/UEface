@@ -6,12 +6,14 @@
 
 from src.storage.mysql_pool import MysqlPool
 import MySQLdb
+import uuid
 # 获取MysqlPool对象
 pool = MysqlPool()
 
 
 class People():
     def __init__(self,name,frame):
+        self.id = str(uuid.uuid1())
         self.name = name
         self.frame = frame
 
@@ -21,8 +23,8 @@ def insert_people(people):
     con = pool.getConnection()
     cus = con.cursor()
     try:
-        people_sql = "insert into people(name,imagebytes) values (%s,%s)"
-        args = (people.name,MySQLdb.Binary(people.frame))
+        people_sql = "insert into people(id,name,imagebytes) values (%s,%s,%s)"
+        args = (people.id,people.name,MySQLdb.Binary(people.frame))
         cus.execute(people_sql,args)             # 执行SQL语句
         con.commit()  # 如果执行成功就提交事务
     except Exception as e:
@@ -35,4 +37,6 @@ def insert_people(people):
 if __name__ == '__main__':
     f = open("11.png","rb")
     x = f.read()
-    insert_people("test",x)
+    f.close()
+    people = People("test",x)
+    insert_people(people)
