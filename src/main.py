@@ -36,6 +36,10 @@ faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 faceFeature = FaceNetExtract(conf) # 人脸特征抽取接口
 jump = True
 
+CACHE = set()
+
+
+
 
 while True:
     if jump:
@@ -69,31 +73,48 @@ while True:
         #         reco = recoginitionDB.Recoginition(saveframe,1,cam.id,id,dt)
         #         recoginitionDB.insert_result(reco)
 
-        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        cv2.imshow("test", frame)
-        cv2.waitKey(0)
+        #
+        # cv2.imshow("test", frame)
+        # cv2.waitKey(0)
         # Hit 'q' on the keyboard to quit!
+
+
 
 
         """frame 转图片,base64编码"""
         img = Image.fromarray(frame, 'RGB')
-
-
         buffered = BytesIO()
         img.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+
         result_dict = {}
-        if face_id:
-            # import pdb
-            # pdb.set_trace()
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for (id, simi) in face_id[0]:
+
+            if id in CACHE:
+                continue
+
+            CACHE.add(id)
             result_dict['ts'] = time
-            result_dict['name'] = face_id[0]
-            result_dict['image'] = img_str
-            result_dict['raw_image'] = img_str
-            result_dict['similarity'] = face_id[1]
+            result_dict['name'] = id  # list
+            result_dict['image'] = img_str  # list
+            result_dict['raw_image'] = img_str  # list
+            result_dict['similarity'] = simi  # list
             print(result_dict)
             q.put(result_dict)
+
+        # if face_id:
+        #     # import pdb
+        #     # pdb.set_trace()
+        #     result_dict['ts'] = time
+        #     result_dict['name'] = redi_names  # list
+        #     result_dict['image'] = redi_images # list
+        #     result_dict['raw_image'] = redi_images  # list
+        #     result_dict['similarity'] = redi_sim  #  list
+        #     print(result_dict)
+        #     q.put(result_dict)
 
 
     jump = not jump
