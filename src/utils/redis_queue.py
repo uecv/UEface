@@ -33,6 +33,11 @@ class RedisQueue(object):
         #     item = item[1]  # 返回值为一个tuple
         return item
 
+    def get_value(self,key):
+        value = self.__db.get(key)
+        return value
+
+
     def get_nowait(self):
         # 直接返回队列第一个元素，如果队列为空返回的是None
         item = self.__db.lpop(self.key)
@@ -55,9 +60,21 @@ class RedisQueue(object):
             buffered = BytesIO()
             im.save(buffered, format="JPEG")
             img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-            self.__db.set(id.split(".")[0],img_str)
+            self.__db.set(name,img_str)
 
 
 
 if __name__ == '__main__':
     x = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0)
+    # q = RedisQueue('rq', host='192.168.0.245', port=6379, db=0)
+    # data = q.get_nowait().decode('utf-8')
+    # raw_image = q.get_value(eval(data)['name'])
+    # result = eval(data)
+    # print ('result',result)
+    # result_dict = {'ts': result['time'],
+    #                'name': result['name'],
+    #                'image': result['img_str'],
+    #                'raw_image': raw_image,
+    #                'similarity': result['similarity'],
+    #                'type': "GET_RECO_RESULT"}
+    # print('result_dict', result_dict)

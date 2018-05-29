@@ -1,3 +1,3 @@
 ### web启动命令
-uwsgi --master --http :8080 --http-websockets --wsgi echo:app
+uwsgi --master --http :5000 --process 4 --http-websockets --wsgi app:app
 
