@@ -6,18 +6,18 @@ import cv2
 import datetime
 from PIL import Image
 from src.Config.Config import Config
-from src.util.redis_queue import RedisQueue
+from src.utils.redis_queue import RedisQueue
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 import  base64
 from io import  BytesIO
-
+from src.DrawPicture.DrawFace import Draw
 from src.service import  recoginiton as recoginitionDB
 
 from src.service import  camframe as camframeDB
 
-q = RedisQueue('rq')  # 新建队列名为rq
+q = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0) #RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
 video_capture = cv2.VideoCapture(0)
 
@@ -31,9 +31,10 @@ facelib = faceNetLib(conf)
 known_face_dataset = facelib.getlib()  #人脸特征库
 
 
-Recognition = faceNetRecognition()  # 人脸识别接口
-faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
-faceFeature = FaceNetExtract(conf) # 人脸特征抽取接口
+Recognition = faceNetRecognition()   # 人脸识别接口
+faceDetect = MTCNNDetection(conf)    # 人脸 检测接口
+faceFeature = FaceNetExtract(conf)   # 人脸特征抽取接口
+draw = Draw(conf)                    # 人脸抠图的接口
 jump = True
 
 CACHE = set()
@@ -91,30 +92,25 @@ while True:
 
         result_dict = {}
         time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        for (id_simi,location) in zip(face_id[0],locations):
+
+        head_imgs = draw.DrawFace(frame, locations, landmarks)
+
+        for (id_simi,location,head) in zip(face_id[0],locations,head_imgs):
+
 
             id,simi = id_simi
 
             if id in CACHE:
                 continue
 
-            #  location  [ymin, xmin, ymax, xmax]
-            ymax = location[0]
 
-            xmin = location[1]
-
-            ymin = location[2]
-
-            xmax = location[3]
-
-            head = frame[xmin:xmax,ymin:ymax,0:3]
             head_img = Image.fromarray(head, 'RGB')
             buffered = BytesIO()
             head_img.save(buffered, format="JPEG")
             img_head_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-            # cv2.imshow("test", head_img)
-            # cv2.waitKey(0)
+            cv2.imshow("test", head)
+            cv2.waitKey(1)
 
 
             CACHE.add(id)
@@ -124,7 +120,7 @@ while True:
             result_dict['raw_image'] = img_head_str  # list
             result_dict['similarity'] = simi  # list
             print(result_dict)
-            q.put(result_dict)
+            # q.put(result_dict)
 
         # if face_id:
         #     # import pdb

@@ -44,8 +44,8 @@ class RedisQueue(object):
         预加载人脸源数据
         :return:
         """
-        images = os.listdir("../library/images/")
-        imagePath = "../library/images/"
+        images = os.listdir("./library/images/")
+        imagePath = "./library/images/"
         for name_id in images:
             print(name_id)
             name, id = name_id.split("_")

@@ -10,7 +10,7 @@ faceNet 模型 人脸特征抽取类
 from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
-
+import  cv2
 from src.FaceFeature.BaseFaceFeature import BaseFaceFeature
 
 class FaceNetExtract(BaseFaceFeature):
@@ -47,6 +47,9 @@ class FaceNetExtract(BaseFaceFeature):
             aligned_face, face_pos = self._aligner.align(
                 160, image, landmarks[i])
             if len(aligned_face) == 160 and len(aligned_face[0]) == 160:
+
+                cv2.imshow("test", aligned_face)
+                cv2.waitKey(1)
                 aligns.append(aligned_face)
                 positions.append(face_pos)
             else:
