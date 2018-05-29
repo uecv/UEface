@@ -62,6 +62,9 @@ class buildLib:
             im = cv2.imread(imagepath)
 
 
+
+
+
             people = perpleDB.People(name,im )
             perpleDB.insert_people(people)
 
@@ -69,6 +72,25 @@ class buildLib:
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
             locations, landmarks = faceDetect.detect(im)
+
+            # cv2.imshow("test", im)
+            # cv2.waitKey(0)
+
+            location = locations[0]
+            ymax = location[0]
+
+            xmin = location[1]
+
+            ymin = location[2]
+
+            xmax = location[3]
+
+            head = im[xmin:xmax, ymin:ymax, 0:3]
+
+
+            cv2.imshow("jj",head)
+            cv2.waitKey(0)
+
 
             # ** 人脸特征抽取
             # features_arr：人脸特征    positions：人脸姿态
