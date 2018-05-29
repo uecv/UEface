@@ -43,7 +43,7 @@ class buildLib:
             name, id = name_id.split("_")
             imagepath = os.path.join(self.imagesPath, name_id)
             im = cv2.imread(imagepath)
-            people = perpleDB.People(name, im)
+            people = perpleDB.People(name, imagepath)
             perpleDB.insert_people(people)
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
