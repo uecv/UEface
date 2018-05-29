@@ -55,7 +55,7 @@ class RedisQueue(object):
             buffered = BytesIO()
             im.save(buffered, format="JPEG")
             img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-            self.__db.set(id.split(".")[0],img_str)
+            self.__db.set(name,img_str)
 
 
 
