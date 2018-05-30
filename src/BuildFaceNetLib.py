@@ -27,11 +27,12 @@ class buildLib:
     """
     what,how
     """
-    def __init__(self, faceFeatureModel, faceDetect):
+    def __init__(self, conf,faceFeatureModel, faceDetect):
+        self.conf = conf
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
-        self.imagesPath = "./library/images/"
-        self.libraryPath = "./library/faceNetLib/facerec_128D.txt"
+        self.imagesPath = conf.get("lib","imagepath")
+        self.libraryPath = conf.get("lib","featurefile")
 
     def build(self):
         data = open(self.libraryPath, 'r').read()
@@ -43,11 +44,11 @@ class buildLib:
             name, id = name_id.split("_")
             imagepath = os.path.join(self.imagesPath, name_id)
             im = cv2.imread(imagepath)
-            people = perpleDB.People(name, imagepath)
+            people = perpleDB.People(name, name_id)
             perpleDB.insert_people(people)
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
-            locations, landmarks = faceDetect.detect(im)
+            locations, landmarks = self.faceDetect.detect(im)
             # ** 人脸特征抽取
             # features_arr：人脸特征    positions：人脸姿态
             features_arr, positions = faceFeature.Extract(im, locations, landmarks)
@@ -67,5 +68,5 @@ if __name__ == '__main__':
     # ** 构建人脸特征库对象
     faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
     faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
-    buildL = buildLib(faceFeature, faceDetect)
+    buildL = buildLib(conf,faceFeature, faceDetect)
     buildL.build()
