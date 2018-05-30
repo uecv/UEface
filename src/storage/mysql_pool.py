@@ -16,6 +16,7 @@ def singleton(cls):
         return instances[cls]
     return getinstance
 
+
 @singleton
 class MysqlPool:
     """

@@ -4,7 +4,7 @@ create table people
 (
 id varchar(36) primary key not null comment '主键',
 name VARCHAR(20) not null comment '名称',
-imagebytes MEDIUMBLOB not null comment '图片的二进制数据',
+image_path varchar(100) not null comment '图片的存储路径',
 create_time DATETIME DEFAULT CURRENT_TIMESTAMP comment '创建时间',
 description VARCHAR(100)  comment '备注'
 ) comment='人信息表';

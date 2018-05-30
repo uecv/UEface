@@ -3,15 +3,13 @@
 '''
 创建人脸特征库
 '''
-
-
 import json
 import os
 import cv2
-from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
+import numpy
 from src.Config.Config import Config
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
-import  numpy
+from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.service import people as perpleDB
 
 class NPEncoder(json.JSONEncoder):
@@ -30,37 +28,31 @@ class buildLib:
     """
     what,how
     """
-    def __init__(self,faceFeatureModel,faceDetect):
-
-
+    def __init__(self, conf,faceFeatureModel, faceDetect):
+        self.conf = conf
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
-
-        self.imagesPath="./library/images/"
-
-        self.libraryPath ="./library/faceNetLib/facerec_128D.txt"
+        self.imagesPath = conf.get("lib","imagepath")
+        self.libraryPath = conf.get("lib","featurefile")
 
     def build(self):
-
         data = open(self.libraryPath, 'r').read()
-        data_set= {}
-        if len(data)>0:
-
+        data_set = {}
+        if len(data) > 0:
             data_set = json.loads(data)
-
-
         images = os.listdir(self.imagesPath)
-
         for name_id in images:
-
-            name = name_id.split(".")[0]
-
-            imagepath = os.path.join(self.imagesPath,name_id)
-
+            name, id = name_id.split("_")
+            imagepath = os.path.join(self.imagesPath, name_id)
             im = cv2.imread(imagepath)
+
+
+
+
 
             people = perpleDB.People(name,im )
             perpleDB.insert_people(people)
+
 
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
@@ -98,17 +90,15 @@ class buildLib:
 
 
         f = open(self.libraryPath, 'w')
-        f.write(json.dumps(data_set,cls=NPEncoder))
-
+        f.write(json.dumps(data_set, cls=NPEncoder))
         f.close()
 
-if __name__ == '__main__':
 
-    # conf = Config("./Config/config.ini")
+
+
+if __name__ == '__main__':
     conf = Config("./Config/config.ini")
     # ** 构建人脸特征库对象
-
-    model_path = conf.get("path", "faceNetModel")
 
     faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
 

@@ -12,13 +12,10 @@ import  base64
 from io import  BytesIO
 
 class RedisQueue(object):
-    def __init__(self, name, namespace='queue', **redis_kwargs):
-        # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis
-        # database的数量
-        self.__db = redis.Redis(**redis_kwargs)
-        self.key = '%s:%s' % (namespace, name)
-        # 预加载人脸元数据
-        # self.pre_load()
+    def __init__(self, name, host, port=6379):
+        # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
+        self.__db = redis.Redis(host=host, port=port, db=0)
+        self.key = name
 
     def qsize(self):
         return self.__db.llen(self.key)  # 返回队列里面list内元素的数量
@@ -49,8 +46,8 @@ class RedisQueue(object):
         预加载人脸源数据
         :return:
         """
-        images = os.listdir("./library/images/")
-        imagePath = "./library/images/"
+        images = os.listdir("../library/images/")
+        imagePath = "../library/images/"
         for name_id in images:
             print(name_id)
             name, id = name_id.split("_")
@@ -65,7 +62,8 @@ class RedisQueue(object):
 
 
 if __name__ == '__main__':
-    x = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0)
+    x = RedisQueue(name="sb",host='192.168.0.245', port=6379)
+    x.pre_load()
     # q = RedisQueue('rq', host='192.168.0.245', port=6379, db=0)
     # data = q.get_nowait().decode('utf-8')
     # raw_image = q.get_value(eval(data)['name'])
