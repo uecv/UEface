@@ -18,7 +18,7 @@ class RedisQueue(object):
         self.__db = redis.Redis(**redis_kwargs)
         self.key = '%s:%s' % (namespace, name)
         # 预加载人脸元数据
-        self.pre_load()
+        # self.pre_load()
 
     def qsize(self):
         return self.__db.llen(self.key)  # 返回队列里面list内元素的数量

@@ -19,7 +19,7 @@ from src.service import  camframe as camframeDB
 
 q = RedisQueue('rq',host='192.168.0.245', port=6379, db=0)  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(src)
+video_capture = cv2.VideoCapture(0)
 video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 
 

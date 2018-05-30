@@ -53,21 +53,14 @@ class buildLib:
 
         for name_id in images:
 
-
-
-            name, id = name_id.split("_")
+            name = name_id.split(".")[0]
 
             imagepath = os.path.join(self.imagesPath,name_id)
 
             im = cv2.imread(imagepath)
 
-
-
-
-
             people = perpleDB.People(name,im )
             perpleDB.insert_people(people)
-
 
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
@@ -109,14 +102,13 @@ class buildLib:
 
         f.close()
 
-
-
-
 if __name__ == '__main__':
 
+    # conf = Config("./Config/config.ini")
     conf = Config("./Config/config.ini")
-
     # ** 构建人脸特征库对象
+
+    model_path = conf.get("path", "faceNetModel")
 
     faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
 
