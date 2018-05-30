@@ -17,8 +17,6 @@ class RedisQueue(object):
         # database的数量
         self.__db = redis.Redis(**redis_kwargs)
         self.key = '%s:%s' % (namespace, name)
-        # 预加载人脸元数据
-        self.pre_load()
 
     def qsize(self):
         return self.__db.llen(self.key)  # 返回队列里面list内元素的数量
@@ -38,24 +36,9 @@ class RedisQueue(object):
         item = self.__db.lpop(self.key)
         return item
 
+    def set(self,key,value):
+        self.__db.set(key,value)
 
-    def pre_load(self):
-        """
-        预加载人脸源数据
-        :return:
-        """
-        images = os.listdir("../library/images/")
-        imagePath = "../library/images/"
-        for name_id in images:
-            print(name_id)
-            name, id = name_id.split("_")
-            imagepath = os.path.join(imagePath,name_id)
-            im = Image.open(imagepath)
-
-            buffered = BytesIO()
-            im.save(buffered, format="JPEG")
-            img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-            self.__db.set(name,img_str)
 
 
 

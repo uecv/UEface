@@ -18,8 +18,6 @@ class Camera():
         self.x=x
         self.y=y
 
-
-
 def insert_camera(camera):
     con = pool.getConnection()
     cus = con.cursor()
