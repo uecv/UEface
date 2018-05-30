@@ -5,9 +5,7 @@
 """
 
 from src.storage.mysql_pool import MysqlPool
-import MySQLdb
 import uuid
-import cv2
 # 获取MysqlPool对象
 pool = MysqlPool()
 
