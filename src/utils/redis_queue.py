@@ -6,10 +6,6 @@
 """
 
 import redis
-from PIL import Image
-import os
-import  base64
-from io import  BytesIO
 
 class RedisQueue(object):
     def __init__(self, name, host, port=6379):
@@ -42,7 +38,6 @@ class RedisQueue(object):
 
     def set(self,key,value):
         self.__db.set(key,value)
-
 
 
 if __name__ == '__main__':
