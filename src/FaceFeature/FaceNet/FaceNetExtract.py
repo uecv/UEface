@@ -48,8 +48,8 @@ class FaceNetExtract(BaseFaceFeature):
                 160, image, landmarks[i])
             if len(aligned_face) == 160 and len(aligned_face[0]) == 160:
 
-                cv2.imshow("test", aligned_face)
-                cv2.waitKey(1)
+                # cv2.imshow("test", aligned_face)
+                # cv2.waitKey(1)
                 aligns.append(aligned_face)
                 positions.append(face_pos)
             else:

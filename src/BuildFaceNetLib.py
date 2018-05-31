@@ -105,8 +105,6 @@ if __name__ == '__main__':
     faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 
 
-
-
     buildL = buildLib(faceFeature,faceDetect)
 
     buildL.build()

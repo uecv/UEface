@@ -19,6 +19,9 @@ from src.service import  camframe as camframeDB
 
 q = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0) #RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
+
+src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
+
 video_capture = cv2.VideoCapture(0)
 conf = Config("./Config/config.ini")
 # ** 构建人脸特征库对象
@@ -65,12 +68,10 @@ while True:
 
 
 
-        #
-        # cv2.imshow("test", frame)
-        # cv2.waitKey(0)
-        # Hit 'q' on the keyboard to quit!
 
 
+
+        continue
 
 
 
