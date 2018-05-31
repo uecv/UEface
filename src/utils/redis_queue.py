@@ -12,9 +12,9 @@ import  base64
 from io import  BytesIO
 
 class RedisQueue(object):
-    def __init__(self, name, host, port=6379):
+    def __init__(self, name, host, port=6379,db=0):
         # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
-        self.__db = redis.Redis(host=host, port=port, db=0)
+        self.__db = redis.Redis(host=host, port=port, db=db)
         self.key = name
 
     def qsize(self):
