@@ -27,7 +27,7 @@ facelib = faceNetLib(conf)
 known_face_dataset = facelib.getlib()  #人脸特征库
 
 
-Recognition = faceNetRecognition()   # 人脸识别接口
+recognition = faceNetRecognition()   # 人脸识别接口
 faceDetect = MTCNNDetection(conf)    # 人脸 检测接口
 faceFeature = FaceNetExtract(conf)   # 人脸特征抽取接口
 draw = Draw(conf)                    # 人脸抠图的接口

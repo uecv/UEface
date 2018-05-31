@@ -11,7 +11,6 @@ import  cv2
 # 获取MysqlPool对象
 pool = MysqlPool()
 
-
 class Recoginition():
     def __init__(self,cap_img,cam_id,frame_id,user_id,cap_time):
         """
@@ -64,23 +63,15 @@ def insert_result(reco):
         cus.close()
         con.close()
 
-
-
-
-
 if __name__ == '__main__':
     # 获取今日统计人数测试
     print(get_nums(1))
-
     # # 测试写入识别结果
     # f = open("11.png","rb")
     # x = f.read()
     # f.close()
-
     x = cv2.imread("sigma_2.png")
-
     dt=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     for i in range(5):
         reco = Recoginition(x,1,1,1,dt)
         insert_result(reco)

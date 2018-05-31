@@ -9,7 +9,6 @@ import MySQLdb
 # 获取MysqlPool对象
 pool = MysqlPool()
 
-
 class Camera():
     def __init__(self,cam_name,map_id,url,x,y):
         self.cam_name = cam_name
@@ -18,9 +17,12 @@ class Camera():
         self.x=x
         self.y=y
 
-
-
 def insert_camera(camera):
+    """
+    增加摄像头
+    :param camera:
+    :return:
+    """
     con = pool.getConnection()
     cus = con.cursor()
     try:
@@ -35,5 +37,27 @@ def insert_camera(camera):
         cus.close()
         con.close()
 
+def get_cameras():
+    con = pool.getConnection()
+    cus = con.cursor()
+    result = None
+    try:
+        sql = "select id,cam_name,map_id,url,x,y from cameras"
+        cus.execute(sql)             # 执行SQL语句
+        result = cus.fetchall()
+    except Exception as e:
+        con.rollback()                 # 如果执行失败就回滚事务
+        raise e
+    finally:
+        cus.close()
+        con.close()
+
+    return result
+
+
+
 
 if __name__ == '__main__':
+    camera = Camera("摄像头A",)
+    insert_camera()
+    #print(get_cameras())
