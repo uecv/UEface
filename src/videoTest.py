@@ -22,10 +22,10 @@ from io import  BytesIO
 # q = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0) #RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
 
-vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/test.mp4"
+vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/20180531.mp4"
 
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(src1807)
+video_capture = cv2.VideoCapture(vidwo_path)
 
 #
 conf = Config("./Config/config.ini")
@@ -44,16 +44,21 @@ jump = True
 #
 # CACHE = set()
 
-
+count =0
 
 while True:
     if jump:
+
 
 
         # 获取一帧视频
         ret, frame = video_capture.read()
         saveframe = frame
         #Todo 判断那一帧进入识别流程
+
+        count += 1
+        if count < 3000:
+            continue
 
         #
         # # 人脸检测:
