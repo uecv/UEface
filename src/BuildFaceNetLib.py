@@ -10,7 +10,7 @@ from src.Config.Config import Config
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.service import people as perpleDB
-
+import numpy as np
 
 class NPEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -41,13 +41,18 @@ class buildLib:
             data_set = json.loads(data)
         images = os.listdir(self.imagesPath)
         for name_id in images:
-            name, id = name_id.split("_")
-            imagepath = os.path.join(self.imagesPath, name_id)
-            im = cv2.imread(imagepath)
-            people = perpleDB.People(name, name_id)
+            name, id = name_id.split(".")[0].split("_")
+            imagepath =self.imagesPath +"/" +name_id  #os.path.join(self.imagesPath, name_id)
+            # im = cv2.imread(imagepath)
+
+            im = cv2.imdecode(np.fromfile(imagepath, dtype=np.uint8), -1)
+            people = perpleDB.People(name,name_id)
             perpleDB.insert_people(people)
+
+
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
+
             locations, landmarks = self.faceDetect.detect(im)
             # ** 人脸特征抽取
             # features_arr：人脸特征    positions：人脸姿态
@@ -68,5 +73,8 @@ if __name__ == '__main__':
     # ** 构建人脸特征库对象
     faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
     faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
-    buildL = buildLib(conf,faceFeature, faceDetect)
+
+
+    buildL = buildLib(conf,faceFeature,faceDetect)
+
     buildL.build()
