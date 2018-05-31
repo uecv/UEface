@@ -23,7 +23,7 @@ def insert_people(people):
     con = pool.getConnection()
     cus = con.cursor()
     try:
-        people_sql = "insert into people(id,name,iamge_path) values (%s,%s,%s)"
+        people_sql = "insert into people(id,name,image_path) values (%s,%s,%s)"
         args = (people.id,people.name,people.iamge_path)
         cus.execute(people_sql,args)             # 执行SQL语句
         con.commit()  # 如果执行成功就提交事务
