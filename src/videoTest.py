@@ -57,7 +57,7 @@ while True:
         #Todo 判断那一帧进入识别流程
 
         count += 1
-        if count < 3000:
+        if count < 3500:
             continue
 
         #
