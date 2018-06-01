@@ -15,10 +15,10 @@ from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 from src.DrawPicture.DrawFace import Draw
 import pandas as pd
 from src.service import  recoginiton as recoginitionDB
-
+import uuid
 from src.service import  camframe as camframeDB
 
-q = RedisQueue(name="sb",host='192.168.0.245', port=6379) #RedisQueue('rq')  # 新建队列名为rq
+redis_connect = RedisQueue(name="sb",host='192.168.0.245', port=6379) #RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
 
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
@@ -74,14 +74,14 @@ while True:
         head_imgs = draw.DrawFace(frame, locations, landmarks)
 
         for (id_simi,location,head) in zip(face_id[0],locations,head_imgs):
-
-
             id,simi = id_simi
 
 
-
-            if id in CACHE:
+            if redis_connect.exists_key(id):
                 continue
+            # if id in CACHE:
+            #     continue
+            redis_connect.time_key(id, simi, 10)
 
 
             head_img = Image.fromarray(head, 'RGB')
@@ -89,28 +89,19 @@ while True:
             head_img.save(buffered, format="JPEG")
             img_head_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-            cv2.imshow("test", head)
-            cv2.waitKey(1)
+            # cv2.imshow("test", head)
+            # cv2.waitKey(1)
 
 
-            CACHE.add(id)
+            # CACHE.add(id)
+            result_dict['id'] = str(uuid.uuid4())
             result_dict['ts'] = time
             result_dict['name'] = id  # list
             result_dict['image'] = img_head_str  # list
             result_dict['raw_image'] = img_head_str  # list
             result_dict['similarity'] = simi  # list
             print(result_dict)
-            # q.put(result_dict)
+            redis_connect.put(result_dict)
 
-        # if face_id:
-        #     # import pdb
-        #     # pdb.set_trace()
-        #     result_dict['ts'] = time
-        #     result_dict['name'] = redi_names  # list
-        #     result_dict['image'] = redi_images # list
-        #     result_dict['raw_image'] = redi_images  # list
-        #     result_dict['similarity'] = redi_sim  #  list
-        #     print(result_dict)
-        #     q.put(result_dict)
 
     jump = not jump
