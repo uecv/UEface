@@ -6,13 +6,14 @@ from io import BytesIO
 import cv2
 from PIL import Image
 from src.Config.Config import Config
-
+from src.service.people import get_peoples
 from src.utils.redis_queue import RedisQueue
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 from src.DrawPicture.DrawFace import Draw
+import pandas as pd
 from src.service import  recoginiton as recoginitionDB
 
 from src.service import  camframe as camframeDB
@@ -29,8 +30,9 @@ facelib = faceNetLib(conf)
 
 known_face_dataset = facelib.getlib()  #人脸特征库
 
+peopleTable = get_peoples()
 
-recognition = faceNetRecognition()   # 人脸识别接口
+Recognition = faceNetRecognition()   # 人脸识别接口
 faceDetect = MTCNNDetection(conf)    # 人脸 检测接口
 faceFeature = FaceNetExtract(conf)   # 人脸特征抽取接口
 draw = Draw(conf)                    # 人脸抠图的接口
