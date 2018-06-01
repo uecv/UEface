@@ -97,7 +97,7 @@ while True:
             for (id, simi) in face_id[0]:
 
                 # if id in CACHE:
-                    # pass
+                    # passgit
                 if redis_connect.exists_key(id):
                     continue
 
