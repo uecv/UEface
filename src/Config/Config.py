@@ -17,6 +17,7 @@ class Config:
         self._conf[key]=value
 
     def get(self,root,key):
+
         return self._conf.get(root,key)
 
     ##Todo 参考开源库里面的实现，

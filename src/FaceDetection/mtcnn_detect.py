@@ -1,3 +1,4 @@
+#coding:utf-8
 '''
 Tensorflow implementation of the mtcnn face detection algorithm
 

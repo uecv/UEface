@@ -2,19 +2,21 @@
 
 import base64
 import datetime
-from io import BytesIO
-from flask_socketio import SocketIO, emit, send
-# from flask_sockets import Sockets
-from flask import Flask, jsonify, request, render_template,make_response
-from flask_cors import CORS
-from PIL import Image
-from src.utils.redis_queue import RedisQueue
-from functools import update_wrapper
-from datetime import timedelta
 import json
 import os
 import time
-q = RedisQueue('rq',host='192.168.0.245', port=6379, db=0)
+from datetime import timedelta
+from functools import update_wrapper
+from io import BytesIO
+
+# from flask_sockets import Sockets
+from flask import Flask, jsonify, make_response, render_template, request
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit, send
+from PIL import Image
+from src.utils.redis_queue import RedisQueue
+
+q = RedisQueue('rq', host='192.168.0.245', port=6379, db=0)
 async_mode = None
 
 app = Flask(__name__)
@@ -111,11 +113,13 @@ def ping_pong():
         "NUMS": "50"
 
     }
-    emit("my_response",msg)
+    emit("my_response", msg)
+
 
 @socketio.on('connect', namespace='/echo')
 def test_connect():
     emit('my_response', {'data': 'Connected'})
+
 
 @socketio.on('disconnect', namespace='/echo')
 def test_disconnect():
@@ -124,7 +128,7 @@ def test_disconnect():
 
 @socketio.on('my_camera', namespace='/echo')
 def get_camera_id(message):
-    print (message)
+    print(message)
     emit('my_response', message)
 #     cam_id = message
 #     print ('cam_id',cam_id)
@@ -133,6 +137,7 @@ def get_camera_id(message):
 #     "id": cam_id
 # }
 #     send(msg, json=True)
+
 
 @socketio.on('my_result', namespace='/echo')
 def get_data():
@@ -158,26 +163,27 @@ def get_data():
         # # result_list.append(result_dict)
         # # return jsonify(result_list)
 
-    for i in range(1,5):
+    for i in range(1, 5):
+
         data = q.get_nowait().decode('utf-8')
-        raw_image = q.get_value(eval(data)['name']).decode('utf-8')
-        result = eval(data)
-        result_dict = {'ts': result['ts'],
-                'name': result['name'],
-                'image': result['image'],
-                'raw_image': raw_image,
-                'similarity': result['similarity'],
-                'type': "GET_RECO_RESULT"}
-        print('result_dict', result_dict)
-        emit("my_response",result_dict)
+        if eval(data)['name']!= "Unknown"
+            raw_image = q.get_value(eval(data)['name']).decode('utf-8')
+            result = eval(data)
+            result_dict = {'ts': result['ts'],
+                           'name': result['name'],
+                           'image': result['image'],
+                           'raw_image': raw_image,
+                           'similarity': result['similarity'],
+                           'type': "GET_RECO_RESULT"}
+            emit("my_response", result_dict)
 
 
-@app.route('/get_time', methods=['GET', 'POST'])
-def get_time():
-    if request.method == "GET":
-        now_time = datetime.datetime.strftime(
-            datetime.datetime.today(), '%Y-%m-%d %H:%M:%S')
-        return jsonify(now_time)
+# @app.route('/get_time', methods=['GET', 'POST'])
+# def get_time():
+#     if request.method == "GET":
+#         now_time = datetime.datetime.strftime(
+#             datetime.datetime.today(), '%Y-%m-%d %H:%M:%S')
+#         return jsonify(now_time)
 
 
 # @app.route('/video/<string:file_name>')
@@ -187,4 +193,4 @@ def get_time():
 
 
 if __name__ == "__main__":
-    socketio.run(app,host='0.0.0.0',port=5000,debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
