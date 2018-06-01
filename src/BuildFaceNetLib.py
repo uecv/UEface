@@ -1,4 +1,4 @@
-# coding:utf-8
+#coding:utf-8
 
 '''
 创建人脸特征库
@@ -13,7 +13,6 @@ from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.service import people as perpleDB
 import numpy as np
 
-
 class NPEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, numpy.integer):
@@ -25,18 +24,16 @@ class NPEncoder(json.JSONEncoder):
         else:
             return super(NPEncoder, self).default(obj)
 
-
 class buildLib:
     """
     what,how
     """
-
-    def __init__(self, conf, faceFeatureModel, faceDetect):
+    def __init__(self, conf,faceFeatureModel, faceDetect):
         self.conf = conf
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
-        self.imagesPath = conf.get("lib", "imagepath")
-        self.libraryPath = conf.get("lib", "featurefile")
+        self.imagesPath = conf.get("lib","imagepath")
+        self.libraryPath = conf.get("lib","featurefile")
 
     def build(self):
         data = open(self.libraryPath, 'r').read()
@@ -60,9 +57,7 @@ class buildLib:
             # ** 人脸特征抽取
             # features_arr：人脸特征    positions：人脸姿态
             features_arr, positions = faceFeature.Extract(im, locations, landmarks)
-
             person_features = {"Left": [], "Right": [], "Center": []}
-
             for pos in person_features:
                 person_features[pos] = features_arr
 
@@ -76,9 +71,7 @@ class buildLib:
 if __name__ == '__main__':
     conf = Config("./Config/config.ini")
     # ** 构建人脸特征库对象
-
     faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
-
     faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 
     buildL = buildLib(conf, faceFeature, faceDetect)

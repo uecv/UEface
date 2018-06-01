@@ -6,15 +6,11 @@
 """
 
 import redis
-from PIL import Image
-import os
-import  base64
-from io import  BytesIO
 
 class RedisQueue(object):
-    def __init__(self, name, host, port=6379):
+    def __init__(self, name, host, port=6379,db=0):
         # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
-        self.__db = redis.Redis(host=host, port=port, db=0)
+        self.__db = redis.Redis(host=host, port=port, db=db)
         self.key = name
 
     def qsize(self):
@@ -40,39 +36,9 @@ class RedisQueue(object):
         item = self.__db.lpop(self.key)
         return item
 
-
-    def pre_load(self):
-        """
-        预加载人脸源数据
-        :return:
-        """
-        images = os.listdir("../library/images/")
-        imagePath = "../library/images/"
-        for name_id in images:
-            print(name_id)
-            name, id = name_id.split("_")
-            imagepath = os.path.join(imagePath,name_id)
-            im = Image.open(imagepath)
-
-            buffered = BytesIO()
-            im.save(buffered, format="JPEG")
-            img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-            self.__db.set(name,img_str)
-
+    def set(self,key,value):
+        self.__db.set(key,value)
 
 
 if __name__ == '__main__':
-    x = RedisQueue(name="sb",host='192.168.0.245', port=6379)
-    x.pre_load()
-    # q = RedisQueue('rq', host='192.168.0.245', port=6379, db=0)
-    # data = q.get_nowait().decode('utf-8')
-    # raw_image = q.get_value(eval(data)['name'])
-    # result = eval(data)
-    # print ('result',result)
-    # result_dict = {'ts': result['time'],
-    #                'name': result['name'],
-    #                'image': result['img_str'],
-    #                'raw_image': raw_image,
-    #                'similarity': result['similarity'],
-    #                'type': "GET_RECO_RESULT"}
-    # print('result_dict', result_dict)
+    x = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0)

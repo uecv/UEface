@@ -21,9 +21,12 @@ class Camframe():
         self.cam_id = cam_id
         self.framebytes = framebytes
 
-
-
 def insert_camframe(camframe):
+    """
+    插入原始的帧
+    :param camframe:
+    :return:
+    """
     con = pool.getConnection()
     cus = con.cursor()
     try:

@@ -1,6 +1,5 @@
 bleach==1.5.0
 click==6.7
-dlib==19.10.0
 face-recognition==1.2.2
 face-recognition-models==0.3.0
 Flask==1.0.2
