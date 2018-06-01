@@ -25,7 +25,7 @@ src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtyp
 vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/20180531.mp4"
 
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(vidwo_path)
+video_capture = cv2.VideoCapture(0)
 
 #
 conf = Config("./Config/config.ini")
