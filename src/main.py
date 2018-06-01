@@ -56,24 +56,11 @@ while True:
         features_arr, positions = faceFeature.Extract(frame, locations, landmarks)
         # ** 人脸识别/特征比对
         face_id = Recognition.Recognit(known_face_dataset, features_arr, positions)
-        #
-        # cam = camframeDB.Camframe(1,saveframe)
-        # camframeDB.insert_camframe(cam)
-
-        # for id in face_id:
-        #     if id !="Unknown":
-        #         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #         reco = recoginitionDB.Recoginition(saveframe,1,cam.id,id,dt)
-        #         recoginitionDB.insert_result(reco)
-
-
 
 
 
         """frame 转图片,base64编码"""
         img = Image.fromarray(frame, 'RGB')
-
-
         buffered = BytesIO()
         img.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
@@ -88,6 +75,8 @@ while True:
 
 
             id,simi = id_simi
+
+
 
             if id in CACHE:
                 continue

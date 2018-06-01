@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding:utf-8
 
 '''
 创建人脸特征库
@@ -12,6 +12,7 @@ from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.service import people as perpleDB
 import numpy as np
+
 
 class NPEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -29,12 +30,13 @@ class buildLib:
     """
     what,how
     """
-    def __init__(self, conf,faceFeatureModel, faceDetect):
+
+    def __init__(self, conf, faceFeatureModel, faceDetect):
         self.conf = conf
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
-        self.imagesPath = conf.get("lib","imagepath")
-        self.libraryPath = conf.get("lib","featurefile")
+        self.imagesPath = conf.get("lib", "imagepath")
+        self.libraryPath = conf.get("lib", "featurefile")
 
     def build(self):
         data = open(self.libraryPath, 'r').read()
@@ -44,42 +46,16 @@ class buildLib:
         images = os.listdir(self.imagesPath)
         for name_id in images:
             name, id = name_id.split(".")[0].split("_")
-            imagepath =self.imagesPath +"/" +name_id  #os.path.join(self.imagesPath, name_id)
+            imagepath = self.imagesPath + "/" + name_id  # os.path.join(self.imagesPath, name_id)
             # im = cv2.imread(imagepath)
 
             im = cv2.imdecode(np.fromfile(imagepath, dtype=np.uint8), -1)
-            people = perpleDB.People(name,name_id)
+            people = perpleDB.People(name, name_id)
             perpleDB.insert_people(people)
-
 
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
             locations, landmarks = faceDetect.detect(im)
-
-            print("success")
-            # cv2.imshow("test", im)
-            # cv2.waitKey(0)
-
-            location = locations[0]
-            ymax = location[0]
-
-            xmin = location[1]
-
-            ymin = location[2]
-
-            xmax = location[3]
-
-            # cv2.rectangle(im, (xmin, ymax), (xmax, ymin), (255, 0, 0))
-            #
-            # cv2.imshow("test", im)
-            # cv2.waitKey(1)
-
-
-            # head = im[xmin:xmax, ymin:ymax, 0:3]
-
-
-
-
 
             # ** 人脸特征抽取
             # features_arr：人脸特征    positions：人脸姿态
@@ -92,12 +68,9 @@ class buildLib:
 
             data_set[people.id] = person_features
 
-
         f = open(self.libraryPath, 'w')
         f.write(json.dumps(data_set, cls=NPEncoder))
         f.close()
-
-
 
 
 if __name__ == '__main__':
@@ -108,7 +81,6 @@ if __name__ == '__main__':
 
     faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 
-
-    buildL = buildLib(conf,faceFeature,faceDetect)
+    buildL = buildLib(conf, faceFeature, faceDetect)
 
     buildL.build()
