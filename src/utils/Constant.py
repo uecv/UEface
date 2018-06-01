@@ -6,3 +6,4 @@
 """
 
 VIDEO_SOURCE = "VIDEO_SOURCE"
+CONFIG_PATH = "./src/Config/config.ini"

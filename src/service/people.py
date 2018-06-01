@@ -69,14 +69,29 @@ def get_peoples():
         return dataframe
 
 
+def get_people(uuid):
+    """
+    返回人脸信息
+    :return:
+    """
+    con = pool.getConnection()
+    cus = con.cursor()
+    result = None
+    try:
+        sql = "select name,image_path from people where id = %s"
+        cus.execute(sql,uuid)             # 执行SQL语句
+        result = cus.fetchall()
+    except Exception as e:
+        con.rollback()                 # 如果执行失败就回滚事务
+        raise e
+    finally:
+        cus.close()
+        con.close()
+        return result
+
+
 if __name__ == '__main__':
     # people = People("test","11.png")
     # insert_people(people)
-    result = get_peoples()
-
-    dd = np.array(result)
-
-
-
-    df =pd.DataFrame(dd,columns=['id','name','image_path'])
+    result = get_people("7ffc069a-654b-11e8-aedd-88d7f69262f6")
     print(result)
