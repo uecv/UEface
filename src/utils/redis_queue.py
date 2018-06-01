@@ -39,6 +39,16 @@ class RedisQueue(object):
     def set(self,key,value):
         self.__db.set(key,value)
 
+    def exists_key(self,key):
+        return self.__db.exists(key)
+
+    def time_key(self,key,values,time):
+        self.__db.setex(key,values,time)
+
+
+
 
 if __name__ == '__main__':
     x = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0)
+    x.set('a',1)
+    x.exists_key('a')
