@@ -18,16 +18,18 @@ from src.utils import Constant
 from src.utils.redis_queue import RedisQueue
 import json
 from src.Config import Config
-
+import os
 conf = Config.Config(Constant.CONFIG_PATH)
 redis_host = conf.get('web', 'redis_host')
 redis_port = conf.get('web', 'redis_port')
 redis_queue = conf.get('web', 'redis_queue')
-image_path = conf.get('web', 'image_path')
+image_root = conf.get('web', 'image_root')
 map_path = conf.get('web', 'map_path')
 
-queue = RedisQueue(host=redis_host,port=redis_host)
-
+queue = RedisQueue(
+    host='192.168.0.245',
+    port=6379)
+count = 0
 class SocketHandler(tornado.websocket.WebSocketHandler):
     def simple_init(self):
         self.last = time.time()
@@ -57,40 +59,38 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
     def check_ten_seconds(self):
         print("Just checking")
-
+        global  count
         #recognition result
-        people_num = list()
         data = queue.get_nowait(redis_queue).decode('utf-8')
-        people_num.append(data)
+        count +=1
         # people_num
         msg = dict({
             "type": "GET_COUNT",
-            "NUMS": len(people_num)
+            "NUMS": count
         })
-        print(eval(data)['name'])
+        # print(eval(data)['user_id'])
 
-        if eval(data)['name'] != "Unknown":
-            result = eval(data)
-            name,image_path = people.get_people(eval(data)['user_id'])
+        result = eval(data)
+        name,image_path = people.get_people(eval(data)['user_id'])
 
-            #人脸库照片
-            img = Image.open('/home/kenwood/cat.jpeg', 'r')
-            buffered = BytesIO()
-            img.save(buffered, format="JPEG")
-            raw_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        #人脸库照片
+        img = Image.open(os.path.join(image_root,image_path), 'r')
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")
+        raw_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-            result_dict = dict({'ts': result['ts'],
-                           #Todo 读数据库
-                           'name': name,
-                           'image': result['head_image'],
-                           'id':   result['id'],
-                           'raw_image': raw_image,
-                           'similarity': result['similarity'],
-                           'type': "GET_RECO_RESULT"})
-            if (time.time() - self.last > 1):
-                self.write_message(msg)
-                self.write_message(result_dict)
-                self.last = time.time()
+        result_dict = dict({'ts': result['ts'],
+                       #Todo 读数据库
+                       'name': name,
+                       'image': result['head_image'],
+                       'id':   result['id'],
+                       'raw_image': raw_image,
+                       'similarity': result['similarity'],
+                       'type': "GET_RECO_RESULT"})
+        if (time.time() - self.last > 1):
+            self.write_message(msg)
+            self.write_message(result_dict)
+            self.last = time.time()
 
 
 class CamHandler(tornado.web.RequestHandler):
@@ -108,14 +108,16 @@ class CamHandler(tornado.web.RequestHandler):
             "camera": [{
                 "name": "摄像头A",
                 "id": 1,
-                "url": "http://192.168.0.245/livestream.flv",
+                # "url": "http://192.168.0.245/livestream.flv",
+                "url":"http://live.useease.cn/live/livestream.flv?auth_key=1528085627-0-0-f02ebe40a90f099cb2c9b7a8c64b7f63",
                 "x": 30,
                 "y": 50
             },
                 {
                     "name": "摄像头B",
                     "id": 2,
-                    "url": "http://192.168.0.245/livestream.flv",
+                    # "url": "http://192.168.0.245/livestream.flv",
+                    "url": "http://live.useease.cn/live/livestream.flv?auth_key=1528085627-0-0-f02ebe40a90f099cb2c9b7a8c64b7f63",
                     "x": 70,
                     "y": 80,
             }]
