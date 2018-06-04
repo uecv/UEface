@@ -3,8 +3,6 @@
 from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
-from PIL import  Image
-import matplotlib.pyplot as plt
 
 class Draw():
     '''
@@ -21,6 +19,8 @@ class Draw():
     def drawFacebyLocation(self,image,locations):
 
         result =[]
+
+
         for location in locations:
             ymin = location[0]-5
             xmin = location[1]-5

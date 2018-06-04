@@ -48,6 +48,6 @@ class RedisQueue(object):
 
 
 if __name__ == '__main__':
-    x = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0)
-    x.set('a',1)
-    x.exists_key('a')
+    x = RedisQueue(host='192.168.0.245', port=6379)
+    print (x.get_nowait('rq'))
+

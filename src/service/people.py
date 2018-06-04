@@ -74,6 +74,7 @@ def get_people(uuid):
     返回人脸信息
     :return:
     """
+    print ('uuid',uuid)
     con = pool.getConnection()
     cus = con.cursor()
     result = None
@@ -87,11 +88,11 @@ def get_people(uuid):
     finally:
         cus.close()
         con.close()
-        return result
-
+        name,path = result[0]
+        return name,path
 
 if __name__ == '__main__':
     # people = People("test","11.png")
     # insert_people(people)
-    result = get_people("7ffc069a-654b-11e8-aedd-88d7f69262f6")
+    result,www = get_people("7ffc069a-654b-11e8-aedd-88d7f69262f6")
     print(result)
