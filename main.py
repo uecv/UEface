@@ -50,7 +50,7 @@ jump = True
 
 while True:
     if jump:
-        jump = not jump
+
         # 获取一帧视频
         start_time = datetime.datetime.now()
         ret, frame = video_capture.read()
@@ -80,7 +80,7 @@ while True:
 
             result_dict = {}
             time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            head_imgs = draw.DrawFace(frame, locations, landmarks)
+            head_imgs = draw.drawFacebyLocation(frame,locations)#draw.DrawFace(frame, locations, landmarks)
 
             # 画框
             for location in locations:

@@ -6,7 +6,7 @@ import cv2
 import datetime
 from PIL import Image
 from src.Config.Config import Config
-from src.utils.redis_queue import RedisQueue
+
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 
@@ -75,7 +75,7 @@ while True:
         #
         # [ymin, xmin, ymax, xmax]
 
-        face_imgs = draw.DrawFace(frame,locations,landmarks)
+        face_imgs = draw.drawFacebyLocation(frame,locations) #draw.DrawFace(frame,locations,landmarks)
 
         # 画框
         for location in locations:
@@ -87,16 +87,19 @@ while True:
 
             cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
 
-        cv2.imshow("test", frame)
-        cv2.waitKey(1)
+
+        for head in face_imgs:
+
+
+            cv2.imshow("test", head)
+            cv2.waitKey(1)
 
             # head = frame[xmin:xmax, ymax:ymin]
             #
             # cv2.imshow("test", head)
             # cv2.waitKey(1)
 
-        # cv2.imshow("test", frame)
-        # cv2.waitKey(1)
+
         # Hit 'q' on the keyboard to quit!
 
 
