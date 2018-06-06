@@ -12,13 +12,24 @@ faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征�
 
 class faceNetRecognition(BaseRecognition):
 
-    def __init__(self):
+    def __init__(self,conf):
         '''
         初始化人脸检测接口   人脸特征抽取接口
         '''
         pass
 
-
+    def _cos(self,vector1, vector2):
+        dot_product = 0.0;
+        normA = 0.0;
+        normB = 0.0;
+        for a, b in zip(vector1, vector2):
+            dot_product += a * b
+            normA += a ** 2
+            normB += b ** 2
+        if normA == 0.0 or normB == 0.0:
+            return None
+        else:
+            return dot_product / ((normA * normB) ** 0.5)
 
     def Recognit(self, known_face_dataset, face_encodings, positions):
         '''
@@ -87,7 +98,7 @@ class faceNetRecognition(BaseRecognition):
             positions,
             data_set=None,
             thres=0.6,
-            percent_thres=80):
+            percent_thres=0.75):
         '''
         :param features_arr: a list of 128d Features of all faces on screen
         :param positions: a list of face position types of all faces on screen
@@ -101,18 +112,19 @@ class faceNetRecognition(BaseRecognition):
         returnRes = []
         for (i, features_128D) in enumerate(features_arr):
             result = "Unknown"
-            smallest = sys.maxsize
+            smallest =0.0 #sys.maxsize
             for person in data_set.keys():
                 person_data = data_set[person][positions[i]]
                 for data in person_data:
-                    distance = np.sqrt(np.sum(np.square(data - features_128D)))
-                    if distance < smallest:
+                    # distance = np.sqrt(np.sum(np.square(data - features_128D)))
+                    distance =self._cos(data,features_128D)  # 相似度，越大越相似
+                    if distance > smallest:
                         smallest = distance
                         result = person
-            percentage = min(100, 100 * thres / smallest)
-            if percentage <= percent_thres:
+            # percentage = min(100, 100 * thres / smallest)
+            if smallest <= percent_thres:
                 result = "Unknown"
-            returnRes.append((result, percentage))
+            returnRes.append((result, smallest))
 
 
         return returnRes,

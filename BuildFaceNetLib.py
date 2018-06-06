@@ -12,6 +12,7 @@ from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.service import people as perpleDB
 import numpy as np
+from src.utils import Constant
 
 class NPEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -33,7 +34,7 @@ class buildLib:
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
         self.imagesPath = conf.get("lib","imagepath")
-        self.libraryPath = conf.get("lib","featurefile")
+        self.libraryPath = conf.get("lib","feature.file")
 
     def build(self):
         data = open(self.libraryPath, 'r').read()
@@ -70,7 +71,7 @@ class buildLib:
 
 
 if __name__ == '__main__':
-    conf = Config("./Config/config.ini")
+    conf = Config(Constant.CONFIG_PATH)
     # ** 构建人脸特征库对象
     faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
     faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
