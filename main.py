@@ -17,19 +17,18 @@ from src.utils.redis_queue import RedisQueue
 from src.utils import Constant
 from src.DrawPicture.DrawFace import Draw
 
-
 redis_connect = RedisQueue(
     host='192.168.0.245',
     port=6379)
 
 src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(src)
 # video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 conf = Config.Config(Constant.CONFIG_PATH)
 redis_host = conf.get('web', 'redis_host')
 redis_port = conf.get('web', 'redis_port')
 redis_queue = conf.get('web', 'redis_queue')
-image_path = conf.get('web', 'image_path')
+image_path = conf.get('web', 'image_root')
 map_path = conf.get('web', 'map_path')
 # ** 构建人脸特征库对象
 facelib = faceNetLib(conf)
@@ -50,11 +49,11 @@ jump = True
 
 while True:
     if jump:
-
         # 获取一帧视频
         start_time = datetime.datetime.now()
         ret, frame = video_capture.read()
-        saveframe = frame
+        frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+
         # Todo 判断那一帧进入识别流程
 
         # 人脸检测:
@@ -80,35 +79,45 @@ while True:
 
             result_dict = {}
             time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            head_imgs = draw.drawFacebyLocation(frame,locations)#draw.DrawFace(frame, locations, landmarks)
+            head_imgs = draw.drawFacebyLocation(frame,locations)
+
+
 
             # 画框
-            for location in locations:
-                # [ymin, xmin, ymax, xmax]
-                ymin = location[0]
-                xmin = location[1]
-                ymax = location[2]
-                xmax = location[3]
+            #############调试代码########################
+            # for location in locations:
+            #     # [ymin, xmin, ymax, xmax]
+            #     ymin = location[0]
+            #     xmin = location[1]
+            #     ymax = location[2]
+            #     xmax = location[3]
+            #
+            #     cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
+            # cv2.imshow("test", frame)
+            # cv2.waitKey(1)
+            ###############################################
 
-                cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
-            cv2.imshow("test", frame)
-            cv2.waitKey(1)
-
-            for (id, simi) in face_id[0]:
-
-                # if id in CACHE:
-                    # passgit
+            for (id_simi,head_image) in zip(face_id[0],head_imgs):
+                id, simi=id_simi
+                if id == "Unknown":
+                    continue
                 if redis_connect.exists_key(id):
                     continue
 
+                head_img = Image.fromarray(head_image, 'RGB')
+                buffered = BytesIO()
+                head_img.save(buffered, format="JPEG")
+                img_head_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
                 # CACHE.add(id)
-                redis_connect.time_key(id, simi, 10)
+                redis_connect.time_key(id, simi, 20)
                 result_dict['id'] = str(uuid.uuid4())
                 result_dict['ts'] = time
                 result_dict['user_id'] = id  # list
-                result_dict['head_image'] = head_imgs  # list
+                result_dict['head_image'] = img_head_str  # list
                 result_dict['similarity'] = int(simi)  # list
                 print(time,result_dict['user_id'])
                 redis_connect.put(redis_queue,result_dict)
+
+    jump = not jump

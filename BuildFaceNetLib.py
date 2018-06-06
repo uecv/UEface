@@ -47,6 +47,7 @@ class buildLib:
             # im = cv2.imread(imagepath)
 
             im = cv2.imdecode(np.fromfile(imagepath, dtype=np.uint8), -1)
+            im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
             people = perpleDB.People(name, name_id)
             perpleDB.insert_people(people)
 
