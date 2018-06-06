@@ -43,7 +43,9 @@ class buildLib:
             data_set = json.loads(data)
         images = os.listdir(self.imagesPath)
         for name_id in images:
+            print(name_id)
             name, id = name_id.split(".")[0].split("_")
+
             imagepath = self.imagesPath + "/" + name_id  # os.path.join(self.imagesPath, name_id)
             # im = cv2.imread(imagepath)
 
