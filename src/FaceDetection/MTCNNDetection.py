@@ -35,7 +35,7 @@ class MTCNNDetection(BaseDetection):
         '''
 
         rects, landmarks = self.detectonModel.detect_face(
-            image, 80)  # min face size is set to 80x80
+            image, 20)  # min face size is set to 80x80
         locations = []
         for (i, rect) in enumerate(rects):
             xmin = rect[0]

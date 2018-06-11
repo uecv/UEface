@@ -3,6 +3,8 @@
 from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
+from PIL import  Image
+import matplotlib.pyplot as plt
 
 class Draw():
     '''
@@ -14,6 +16,27 @@ class Draw():
         FRGraph = FaceRecGraph()
 
         self._aligner = AlignCustom()
+
+
+    def drawFacebyLocation(self,image,locations):
+
+        result =[]
+
+
+        for location in locations:
+            ymin = location[0]-5
+            xmin = location[1]-5
+            ymax = location[2]+5
+            xmax = location[3]+5
+
+            # box = (xmin,ymax,xmax,ymin)
+            # pil_image = Image.fromarray(image)
+            # head = pil_image.crop(box)
+
+            head =image[ymax:ymin,xmin:xmax]
+
+            result.append(head)
+        return result
 
 
     def DrawFace(self,image, locations,landmarks):

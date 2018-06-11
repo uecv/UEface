@@ -6,6 +6,9 @@
 
 from src.storage.mysql_pool import MysqlPool
 import uuid
+import pandas as pd
+from pandas import  Series
+import  numpy as np
 # 获取MysqlPool对象
 pool = MysqlPool()
 
@@ -49,7 +52,7 @@ def get_peoples():
     cus = con.cursor()
     result = None
     try:
-        sql = "select id,image_path from people"
+        sql = "select id,name,image_path from people"
         cus.execute(sql)             # 执行SQL语句
         result = cus.fetchall()
     except Exception as e:
@@ -58,11 +61,38 @@ def get_peoples():
     finally:
         cus.close()
         con.close()
-        return result
 
+        array = np.array(result)
+
+        dataframe = pd.DataFrame(array, columns=['id', 'name', 'image_path'])
+
+        return dataframe
+
+
+def get_people(uuid):
+    """
+    返回人脸信息
+    :return:
+    """
+    print ('uuid',uuid)
+    con = pool.getConnection()
+    cus = con.cursor()
+    result = None
+    try:
+        sql = "select name,image_path from people where id = %s"
+        cus.execute(sql,uuid)             # 执行SQL语句
+        result = cus.fetchall()
+    except Exception as e:
+        con.rollback()                 # 如果执行失败就回滚事务
+        raise e
+    finally:
+        cus.close()
+        con.close()
+        name,path = result[0]
+        return name,path
 
 if __name__ == '__main__':
-    people = People("test","11.png")
-    insert_people(people)
-    result = get_peoples()
+    # people = People("test","11.png")
+    # insert_people(people)
+    result,www = get_people("7ffc069a-654b-11e8-aedd-88d7f69262f6")
     print(result)
