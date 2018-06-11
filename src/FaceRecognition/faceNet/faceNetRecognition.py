@@ -47,7 +47,7 @@ class faceNetRecognition(BaseRecognition):
 
 
 
-        return face_ID
+        return face_ID[0]
 
 
     # def face_locations_encoding(self, image):

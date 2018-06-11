@@ -5,7 +5,7 @@ import base64
 import datetime
 import uuid
 from io import BytesIO
-
+import  numpy as np
 import cv2
 from PIL import Image
 from src.Config import Config
@@ -15,14 +15,14 @@ from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 from src.utils.redis_queue import RedisQueue
 from src.utils import Constant
-from src.DrawPicture.DrawFace import Draw
+from src.DrawPicture.DrawFace import ImageUtil
 
 redis_connect = RedisQueue(
     host='192.168.0.245',
     port=6379)
 
 src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(src)
+video_capture = cv2.VideoCapture(0)
 # video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 conf = Config.Config(Constant.CONFIG_PATH)
 redis_host = conf.get('web', 'redis_host')
@@ -42,62 +42,128 @@ faceDetect = MTCNNDetection(conf)
 # 人脸特征抽取接口
 faceFeature = FaceNetExtract(conf)
 
-draw = Draw(conf)                    # 人脸抠图的接口
+imageUtil = ImageUtil(conf)                    # 人脸抠图的接口
 
 jump = True
 
+start_time = datetime.datetime.now()
+dist_name_num ={}
+
+countFrame =0
+
+def addFrame2Cach(face_id, face_image, dist_id_num):
+    '''
+    1、将每一帧的结果保存到dist_name_num中。
+    2、根据时间判断是否清除缓存dist_name_num
+    :param face_id:
+    :param locations:
+    :param start_time:
+    :param dist_name_num:
+    :return:
+    '''
+
+    for id_simi, img in zip(face_id, face_image):
+
+        id,simi = id_simi
+
+        if id not in dist_id_num:
+            dist_id_num[id] = [1,[img],[simi]]
+        else:
+            k = dist_id_num[id][0]
+            dist_id_num[id][0] = dist_id_num[id][0] + 1
+            dist_id_num[id][1].append(img)
+            dist_name_num[id][2].append(simi)
+
+
+
+def filterByCach(dist_name_num):
+
+
+    web_faceid = []
+
+    web_faceimg = []
+
+    for id in dist_name_num:
+
+        num,head_images,simis = dist_name_num[id]
+
+        resultsimis = np.mean(simis)
+
+        maxsimi_index = simis.index(max(simis))
+
+        result_head = head_images[maxsimi_index]
+
+        if num > 10:
+            web_faceid.append((id,resultsimis))
+            print(id,resultsimis)
+            web_faceimg.append(result_head)
+
+    return web_faceid,web_faceimg
+
 
 while True:
-    if jump:
-        # 获取一帧视频
-        start_time = datetime.datetime.now()
-        ret, frame = video_capture.read()
-        frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
-        # Todo 判断那一帧进入识别流程
+    # 获取一帧视频
+    # start_time = datetime.datetime.now()
+    ret, frame = video_capture.read()
+    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
-        # 人脸检测:
-        # locations：人脸位置。  landmarks：人脸特征点
-        locations, landmarks = faceDetect.detect(frame)
-        if locations:
+    # Todo 判断那一帧进入识别流程
 
-            # ** 人脸特征抽取
-            # features_arr：人脸特征    positions：人脸姿态
-            features_arr, positions = faceFeature.Extract(
-                frame, locations, landmarks)
+    # 人脸检测:
+    # locations：人脸位置。  landmarks：人脸特征点
+    locations, landmarks = faceDetect.detect(frame)
+    if locations:
 
-            # ** 人脸识别/特征比对
-            face_id = Recognition.Recognit(
-                known_face_dataset, features_arr, positions)
+        # ** 人脸特征抽取
+        # features_arr：人脸特征    positions：人脸姿态
+        features_arr, positions = faceFeature.Extract(
+            frame, locations, landmarks)
 
-            #Todo 原始帧
-            # """frame 转图片,base64编码"""
-            # img = Image.fromarray(frame, 'RGB')
-            # buffered = BytesIO()
-            # img.save(buffered, format="JPEG")
-            # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-            result_dict = {}
-            time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            head_imgs = draw.drawFacebyLocation(frame,locations)
+        # ** 人脸识别/特征比对
+        face_id = Recognition.Recognit(
+            known_face_dataset, features_arr, positions)
 
 
 
-            # 画框
-            #############调试代码########################
-            # for location in locations:
-            #     # [ymin, xmin, ymax, xmax]
-            #     ymin = location[0]
-            #     xmin = location[1]
-            #     ymax = location[2]
-            #     xmax = location[3]
-            #
-            #     cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
-            # cv2.imshow("test", frame)
-            # cv2.waitKey(1)
-            ###############################################
+        #Todo 原始帧
+        # """frame 转图片,base64编码"""
+        # img = Image.fromarray(frame, 'RGB')
+        # buffered = BytesIO()
+        # img.save(buffered, format="JPEG")
+        # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-            for (id_simi,head_image) in zip(face_id[0],head_imgs):
+        result_dict = {}
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        head_imgs = imageUtil.getFaceImgbyLocation(frame, locations)
+
+        addFrame2Cach(face_id, head_imgs, dist_name_num)
+
+
+
+        # 画框
+        #############调试代码########################
+        # for location in locations:
+        #     # [ymin, xmin, ymax, xmax]
+        #     ymin = location[0]
+        #     xmin = location[1]
+        #     ymax = location[2]
+        #     xmax = location[3]
+        #
+        #     cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
+        # cv2.imshow("test", frame)
+        # cv2.waitKey(1)
+        ###############################################
+
+        countFrame += 1
+        clear = countFrame > 25
+        print(countFrame)
+
+        if clear:
+
+            web_ids,web_headimages = filterByCach(dist_name_num)
+
+            for (id_simi,head_image) in zip(web_ids,web_headimages):
                 id, simi=id_simi
                 if id == "Unknown":
                     continue
@@ -120,4 +186,7 @@ while True:
                 print(time,result_dict['user_id'])
                 redis_connect.put(redis_queue,result_dict)
 
-    jump = not jump
+            dist_name_num = {}  #清空缓存
+
+            countFrame = 0 #重新开始计数
+

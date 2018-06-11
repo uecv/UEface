@@ -13,7 +13,7 @@ import  numpy as np
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 
-from src.DrawPicture.DrawFace import Draw
+from src.DrawPicture.DrawFace import ImageUtil
 
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 import  base64
@@ -42,7 +42,7 @@ known_face_dataset = facelib.getlib()  #人脸特征库
 Recognition = faceNetRecognition(conf)  # 人脸识别接口 RandomForestRecognition(conf)     #
 faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 faceFeature = FaceNetExtract(conf) # 人脸特征抽取接口
-draw =Draw(conf)
+draw =ImageUtil(conf)
 jump = True
 #
 # CACHE = set()
@@ -149,7 +149,7 @@ while True:
 
 
 
-        face_imgs = draw.drawFacebyLocation(frame,locations) #draw.DrawFace(frame,locations,landmarks)
+        face_imgs = draw.getFaceImgbyLocation(frame, locations) #draw.DrawFace(frame,locations,landmarks)
 
         # 画框
         for location, id in zip(locations, names):

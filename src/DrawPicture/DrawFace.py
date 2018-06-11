@@ -4,7 +4,7 @@ from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
 
-class Draw():
+class ImageUtil():
     '''
     图片操作类，
     获取图片中的头像
@@ -16,7 +16,7 @@ class Draw():
         self._aligner = AlignCustom()
 
 
-    def drawFacebyLocation(self,image,locations):
+    def getFaceImgbyLocation(self, image, locations):
 
         result =[]
 

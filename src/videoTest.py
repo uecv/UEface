@@ -10,7 +10,7 @@ from src.Config.Config import Config
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 
-from src.DrawPicture.DrawFace import Draw
+from src.DrawPicture.DrawFace import ImageUtil
 
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 import  base64
@@ -39,7 +39,7 @@ conf = Config("./Config/config.ini")
 # Recognition = faceNetRecognition()  # 人脸识别接口
 faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 faceFeature = FaceNetExtract(conf) # 人脸特征抽取接口
-draw =Draw(conf)
+draw =ImageUtil(conf)
 jump = True
 #
 # CACHE = set()
@@ -75,7 +75,7 @@ while True:
         #
         # [ymin, xmin, ymax, xmax]
 
-        face_imgs = draw.drawFacebyLocation(frame,locations) #draw.DrawFace(frame,locations,landmarks)
+        face_imgs = draw.getFaceImgbyLocation(frame, locations) #draw.DrawFace(frame,locations,landmarks)
 
         # 画框
         for location in locations:
