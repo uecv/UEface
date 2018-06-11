@@ -3,6 +3,8 @@
 
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
+from xpinyin import  Pinyin
+from src.service.people import get_people
 from src.FaceRecognition.RandomForest.RandomForestRecognition import RandomForestRecognition
 import datetime
 from PIL import Image
@@ -26,8 +28,8 @@ src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtyp
 vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/testVedio.mp4"
 
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(vidwo_path)
-video_capture.set(cv2.CAP_PROP_FPS,1)
+video_capture = cv2.VideoCapture(0)
+video_capture.set(cv2.CAP_PROP_FPS,10)
 #
 conf = Config("./src/Config/config.ini")
 #
@@ -45,11 +47,21 @@ jump = True
 #
 # CACHE = set()
 
-count =0
+COUNT =0
+
+# 获得视频的格式
+
+
+# 获得码率及尺寸
+fps = video_capture.get(cv2.CAP_PROP_FPS)
+size = (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+        int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+fourcc = cv2.VideoWriter_fourcc("X","V","I","D")
+# 指定写视频的格式, I420-avi, MJPG-mp4
+videoWriter = cv2.VideoWriter('oto_other.mp4', fourcc, fps, size)
 
 while True:
     if jump:
-
 
 
         luyupath ="./src/library/images/卢宇_003.png"
@@ -58,15 +70,15 @@ while True:
         # 获取一帧视频
         ret, frame = video_capture.read()
 
-        # frame = cv2.medianBlur(frame,3)
-        blurred = np.hstack([cv2.medianBlur(frame, 3),
-                             cv2.medianBlur(frame, 5),
-                             cv2.medianBlur(frame, 7)
-                             ])
-        cv2.imshow("Median", blurred)
-        # cv2.imshow("test", frame)
-        cv2.waitKey(1)
-        continue
+        # # frame = cv2.medianBlur(frame,3)
+        # blurred = np.hstack([cv2.medianBlur(frame, 3),
+        #                      cv2.medianBlur(frame, 5),
+        #                      cv2.medianBlur(frame, 7)
+        #                      ])
+        # cv2.imshow("Median", blurred)
+        # # cv2.imshow("test", frame)
+        # cv2.waitKey(1)
+        # continue
 
         # saveframe = frame
         # frame = cv2.imdecode(np.fromfile(videopath, dtype=np.uint8), -1)
@@ -104,30 +116,43 @@ while True:
         # features_arr：人脸特征    positions：人脸姿态
         features_arr, positions = faceFeature.Extract(frame,locations, landmarks)
 
-        newFeature =[]
-        newPosition =[]
-        newLocations = []
-        for position,feature,location in zip(positions,features_arr,locations):
-            if position == 'Center':
-                newFeature.append(feature)
-                newLocations.append(location)
-                newPosition.append(position)
-        features_arr = newFeature
-        positions = newPosition
-        locations = newLocations
+        # newFeature =[]
+        # newPosition =[]
+        # newLocations = []
+        # for position,feature,location in zip(positions,features_arr,locations):
+        #     if position == 'Center':
+        #         newFeature.append(feature)
+        #         newLocations.append(location)
+        #         newPosition.append(position)
+        # features_arr = newFeature
+        # positions = newPosition
+        # locations = newLocations
 
 
 
         #
         # # ** 人脸识别/特征比对
         face_id = Recognition.Recognit(known_face_dataset, features_arr, positions)
-        #
+
+        names = []
+
+        PY = Pinyin()
+        for temp in face_id:
+            id, simi = temp[0]
+            name = "unknown"
+            if id != "Unknown":
+                name, img_path = get_people(id)
+                name = PY.get_pinyin(name)
+            names.append(name)
         # [ymin, xmin, ymax, xmax]
+
+
+
 
         face_imgs = draw.drawFacebyLocation(frame,locations) #draw.DrawFace(frame,locations,landmarks)
 
         # 画框
-        for location,id,va in zip(locations,face_id,vague):
+        for location, id in zip(locations, names):
             # [ymin, xmin, ymax, xmax]
             ymin = location[0]
             xmin = location[1]
@@ -137,9 +162,10 @@ while True:
             cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
             font = cv2.FONT_HERSHEY_SIMPLEX  # 定义字体
             #
+
             frame = cv2.putText(frame, str(id), (xmin, ymax), font, 1.2, (255, 255, 255), 2)
             # frame = cv2.putText(frame, str(va), (xmin, ymax+10), font, 1.2, (255, 255, 255), 2)
-        for head in face_imgs:
+        # for head in face_imgs:
 
 
             """frame 转图片,base64编码"""
@@ -148,9 +174,13 @@ while True:
 
 
         print(face_id)
-
+        videoWriter.write(frame)  # 写视频帧
         cv2.imshow("test", frame)
         cv2.waitKey(1)
+
+
+
+
 
             # head = frame[xmin:xmax, ymax:ymin]
             #
@@ -163,4 +193,3 @@ while True:
 
 
 
-    jump = not jump
