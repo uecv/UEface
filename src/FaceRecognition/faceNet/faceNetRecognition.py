@@ -163,11 +163,11 @@ class faceNetRecognition(BaseRecognition):
 
             from functools import  reduce
 
-            def add(x,y):
-                resule = x[2] + y[2]
-                return resule
-
-            ss = reduce(add,simi_sort)
+            # def add(x,y):
+            #     resule = x[2] + y[2]
+            #     return resule
+            #
+            # ss = reduce(add,simi_sort)
 
 
 
