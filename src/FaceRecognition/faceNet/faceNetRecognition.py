@@ -1,6 +1,7 @@
+# coding=utf-8
 import json
 import sys
-
+import  time
 import cv2
 import numpy as np
 from src.FaceRecognition.BaseRecognition import BaseRecognition
@@ -84,21 +85,24 @@ class faceNetRecognition(BaseRecognition):
 
     def mapFunction(self,name):
 
-
+        t1 = time.time()
         if name=="UEPEOPLE":
-            print("error")
+            return name,0,0.0
 
         # '61ce9a22-6e0d-11e8-a284-3ca06736b3e1'
         lib_person = self.data_set[name]['Center']
 
         if len(lib_person)<1:
-            return name,0
+            return name,0,0.0
         lib_person = lib_person[0]
         person = self.data_set['UEPEOPLE']
 
         simi = self._cos(lib_person, person)  # 相似度，越大越相似
 
-        return  name,simi
+        t2 = time.time()
+
+
+        return  name,simi,t2-t1
 
 
 
@@ -141,16 +145,35 @@ class faceNetRecognition(BaseRecognition):
         from multiprocessing import Pool
         from multiprocessing.dummy import Pool as ThreadPool
 
-        pool = ThreadPool()
+        pool = ThreadPool(5)
         for people in features_arr:
             IDs_lib = list(self.data_set.keys())
             self.data_set['UEPEOPLE'] = people
 
             # 相似度列表，用户与人脸库中5000多个的相似度
+            import time
+            t1 = time.time()
             simi_result = pool.map(self.mapFunction,IDs_lib)
-            simi_sort = sorted(simi_result,key= lambda x:x[1],reverse=True)
+            t2 = time.time()
+            print("map操作时间：{t}".format(t = (t2 - t1)))
 
-            id,simi_max = simi_sort[0]
+            simi_sort = sorted(simi_result,key= lambda x:x[1],reverse=True)
+            t3 = time.time()
+            print("排序操作时间：{t}".format(t=(t3 - t2)))
+
+            from functools import  reduce
+
+            def add(x,y):
+                resule = x[2] + y[2]
+                return resule
+
+            ss = reduce(add,simi_sort)
+
+
+
+
+
+            id,simi_max,_ = simi_sort[0]
 
             result = id
             if simi_max < percent_thres:

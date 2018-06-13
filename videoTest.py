@@ -1,9 +1,9 @@
-
+# coding=utf-8
 
 
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 import cv2
-from xpinyin import  Pinyin
+
 from src.service.people import get_people
 from src.FaceRecognition.RandomForest.RandomForestRecognition import RandomForestRecognition
 import datetime
@@ -12,7 +12,7 @@ from src.Config.Config import Config
 import  numpy as np
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
-
+import time
 from src.DrawPicture.DrawFace import ImageUtil
 
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
@@ -20,15 +20,13 @@ import  base64
 from io import  BytesIO
 
 
-
-
 # q = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0) #RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
 
 vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/testVedio.mp4"
-
+video_path_245 = "testVedio.mp4"
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(vidwo_path)
 video_capture.set(cv2.CAP_PROP_FPS,10)
 #
 conf = Config("./src/Config/config.ini")
@@ -67,7 +65,7 @@ while True:
     # 获取一帧视频
     ret, frame = video_capture.read()
 
-    start_time = datetime.datetime.now()
+    start_time = time.time()
     # # frame = cv2.medianBlur(frame,3)
     # blurred = np.hstack([cv2.medianBlur(frame, 3),
     #                      cv2.medianBlur(frame, 5),
@@ -92,10 +90,10 @@ while True:
     # # locations：人脸位置。  landmarks：人脸特征点
     locations, landmarks = faceDetect.detect(frame)
 
-    t1 = (datetime.datetime.now() - start_time).seconds
+    t1 = (time.time() - start_time)
 
-    print("人脸检测时间 {t1}" )
-    print(t1)
+    # print("人脸检测时间 {t1}" )
+    # print(t1)
 
     #
     # 判断人脸位置是否模糊
@@ -120,10 +118,10 @@ while True:
     # features_arr：人脸特征    positions：人脸姿态
     features_arr, positions = faceFeature.Extract(frame,locations, landmarks)
 
-    t2 = (datetime.datetime.now() - start_time).seconds
+    t2 = (time.time() - start_time)
 
-    print("到达人脸特征抽取的时间 {t2}")
-    print(t2)
+    # print("到达人脸特征抽取的时间 {t2}")
+    # print(t2)
     # newFeature =[]
     # newPosition =[]
     # newLocations = []
@@ -135,12 +133,12 @@ while True:
     # features_arr = newFeature
     # positions = newPosition
     # locations = newLocations
-
+    start_time = time.time()
     #
     # # ** 人脸识别/特征比对
     face_id = Recognition.Recognit(known_face_dataset, features_arr, positions)
 
-    t3 = (datetime.datetime.now() - start_time).seconds
+    t3 = (time.time() - start_time)
     print("到达人脸验证花费的时间{t3}")
     print(t3)
     print(face_id)
