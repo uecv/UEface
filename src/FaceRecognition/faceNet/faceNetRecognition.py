@@ -42,6 +42,8 @@ class faceNetRecognition(BaseRecognition):
         '''
 
 
+        self.data_set = known_face_dataset
+
         face_ID = self.findPeople(
             face_encodings, positions, data_set=known_face_dataset)
 
@@ -79,6 +81,29 @@ class faceNetRecognition(BaseRecognition):
     #
     #     return np.array(locations), features_arr, positions, image
 
+
+    def mapFunction(self,name):
+
+
+        if name=="UEPEOPLE":
+            print("error")
+
+        # '61ce9a22-6e0d-11e8-a284-3ca06736b3e1'
+        lib_person = self.data_set[name]['Center']
+
+        if len(lib_person)<1:
+            return name,0
+        lib_person = lib_person[0]
+        person = self.data_set['UEPEOPLE']
+
+        simi = self._cos(lib_person, person)  # 相似度，越大越相似
+
+        return  name,simi
+
+
+
+
+
     '''
     facerec_128D.txt Data Structure:
     {
@@ -110,21 +135,51 @@ class faceNetRecognition(BaseRecognition):
             f = open('./facerec_128D.txt', 'r')
             data_set = json.loads(f.read())
         returnRes = []
-        for (i, features_128D) in enumerate(features_arr):
-            result = "Unknown"
-            smallest =0.0 #sys.maxsize
-            for person in data_set.keys():
-                person_data = data_set[person][positions[i]]
-                for data in person_data:
-                    # distance = np.sqrt(np.sum(np.square(data - features_128D)))
-                    distance =self._cos(data,features_128D)  # 相似度，越大越相似
-                    if distance > smallest:
-                        smallest = distance
-                        result = person
-            # percentage = min(100, 100 * thres / smallest)
-            if smallest <= percent_thres:
-                result = "Unknown"
-            returnRes.append((result, smallest))
+        ######################################################
+
+        '''使用map函数优化循环性能测试'''
+        from multiprocessing import Pool
+        from multiprocessing.dummy import Pool as ThreadPool
+
+        pool = ThreadPool()
+        for people in features_arr:
+            IDs_lib = list(self.data_set.keys())
+            self.data_set['UEPEOPLE'] = people
+
+            # 相似度列表，用户与人脸库中5000多个的相似度
+            simi_result = pool.map(self.mapFunction,IDs_lib)
+            simi_sort = sorted(simi_result,key= lambda x:x[1],reverse=True)
+
+            id,simi_max = simi_sort[0]
+
+            result = id
+            if simi_max < percent_thres:
+                result = 'Unknown'
+            returnRes.append(result)
+
+
+
+
+
+
+
+
+        ######################################################
+        # for (i, features_128D) in enumerate(features_arr):
+        #     result = "Unknown"
+        #     smallest =0.0 #sys.maxsize
+        #     for person in data_set.keys():
+        #         person_data = data_set[person][positions[i]]
+        #         for data in person_data:
+        #             # distance = np.sqrt(np.sum(np.square(data - features_128D)))
+        #             distance =self._cos(data,features_128D)  # 相似度，越大越相似
+        #             if distance > smallest:
+        #                 smallest = distance
+        #                 result = person
+        #     # percentage = min(100, 100 * thres / smallest)
+        #     if smallest <= percent_thres:
+        #         result = "Unknown"
+        #     returnRes.append((result, smallest))
 
 
         return returnRes,

@@ -35,6 +35,8 @@ facelib = faceNetLib(conf)
 # 人脸特征库
 known_face_dataset = facelib.getlib()
 
+ss = known_face_dataset["61ce9a22-6e0d-11e8-a284-3ca06736b3e1"]
+
 # 人脸识别接口
 Recognition = faceNetRecognition(conf)
 # 人脸 检测接口
@@ -46,7 +48,7 @@ imageUtil = ImageUtil(conf)                    # 人脸抠图的接口
 
 jump = True
 
-start_time = datetime.datetime.now()
+
 dist_name_num ={}
 
 countFrame =0
@@ -108,6 +110,7 @@ while True:
     ret, frame = video_capture.read()
     frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
+
     # Todo 判断那一帧进入识别流程
 
     # 人脸检测:
@@ -157,7 +160,7 @@ while True:
 
         countFrame += 1
         clear = countFrame > 25
-        print(countFrame)
+        # print(countFrame)
 
         if clear:
 
