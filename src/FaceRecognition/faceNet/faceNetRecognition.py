@@ -101,10 +101,6 @@ class faceNetRecognition(BaseRecognition):
 
         return  name,simi,t2-t1
 
-
-
-
-
     '''
     facerec_128D.txt Data Structure:
     {
