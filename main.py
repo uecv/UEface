@@ -37,7 +37,7 @@ facelib = faceNetLib(conf)
 # 人脸特征库
 known_face_dataset = facelib.getlib()
 
-ss = known_face_dataset["61ce9a22-6e0d-11e8-a284-3ca06736b3e1"]
+
 
 # 人脸识别接口
 Recognition = faceNetRecognition(conf)
@@ -128,6 +128,31 @@ while True:
         # ** 人脸识别/特征比对
         face_id = Recognition.Recognit(
             known_face_dataset, features_arr, positions)
+
+
+
+        ##############删除掉侧脸的头像###############
+
+        newlocation = []
+        newPosition = []
+        newFeature  = []
+
+        for location,position,feature in zip(locations,positions,features_arr):
+
+            if position=="Center":
+                newlocation.append(location)
+                newPosition.append(position)
+                newFeature.append(feature)
+
+        locations = newlocation
+        positions = newPosition
+        features_arr = newFeature
+
+
+        ##############################
+
+
+
 
 
 
