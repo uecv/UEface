@@ -3,25 +3,26 @@
    @author: wy
    @time: 2018/5/23 0023
 """
-
-from src.storage.mysql_pool import MysqlPool
 import uuid
-import pandas as pd
-from pandas import  Series
-import  numpy as np
-# 获取MysqlPool对象
-pool = MysqlPool()
+from sqlalchemy import Column, String,DATETIME
+import datetime
+from src.storage import db
+session = db.Session()
 
-
-class People():
+class People(db.Base):
+    __tablename__ = 'people'
+    __table_args__ = {'extend_existing':True}
     """
     实体类,对应数据库中people表
     """
-    def __init__(self,name,image_path):
-        self.id = str(uuid.uuid1())
-        self.name = name
-        self.image_path = image_path
+    id = Column(String(36),default=uuid.uuid1(), primary_key=True)
+    name = Column(String(20),nullable=False)
+    worker_id = Column(String(20))
+    image_path = Column(String(100),nullable=False)
+    create_time = Column(DATETIME,default=datetime.datetime.utcnow)
 
+    def __repr__(self):
+        return "People(%s,%s,%s,%s)" %(str(self.id),self.name,self.worker_id,self.image_path)
 
 def insert_people(people):
     """
@@ -29,44 +30,17 @@ def insert_people(people):
     :param people:
     :return:
     """
-    con = pool.getConnection()
-    cus = con.cursor()
-    try:
-        people_sql = "insert into people(id,name,image_path) values (%s,%s,%s)"
-        args = (people.id,people.name,people.image_path)
-        cus.execute(people_sql,args)             # 执行SQL语句
-        con.commit()  # 如果执行成功就提交事务
-    except Exception as e:
-        con.rollback()                 # 如果执行失败就回滚事务
-        raise e
-    finally:
-        cus.close()
-        con.close()
+    session.add(people)
+    session.commit()
+
+
 
 def get_peoples():
     """
     返回人脸信息
     :return:
     """
-    con = pool.getConnection()
-    cus = con.cursor()
-    result = None
-    try:
-        sql = "select id,name,image_path from people"
-        cus.execute(sql)             # 执行SQL语句
-        result = cus.fetchall()
-    except Exception as e:
-        con.rollback()                 # 如果执行失败就回滚事务
-        raise e
-    finally:
-        cus.close()
-        con.close()
-
-        array = np.array(result)
-
-        dataframe = pd.DataFrame(array, columns=['id', 'name', 'image_path'])
-
-        return dataframe
+    return session.query(People).all()
 
 
 def get_people(uuid):
@@ -74,25 +48,13 @@ def get_people(uuid):
     返回人脸信息
     :return:
     """
-    print ('uuid',uuid)
-    con = pool.getConnection()
-    cus = con.cursor()
-    result = None
-    try:
-        sql = "select name,image_path from people where id = %s"
-        cus.execute(sql,uuid)             # 执行SQL语句
-        result = cus.fetchall()
-    except Exception as e:
-        con.rollback()                 # 如果执行失败就回滚事务
-        raise e
-    finally:
-        cus.close()
-        con.close()
-        name,path = result[0]
-        return name,path
+    return session.query(People(uuid=uuid)).fist()
+
 
 if __name__ == '__main__':
-    # people = People("test","11.png")
-    # insert_people(people)
-    result,www = get_people("7ffc069a-654b-11e8-aedd-88d7f69262f6")
-    print(result)
+    p = People(name = 'qwe',image_path = 'dsfsd')
+    session.add(p)
+    session.commit()
+    print(get_peoples())
+    our_user = session.query(People).filter_by(name='qwe').first()
+    print(our_user)

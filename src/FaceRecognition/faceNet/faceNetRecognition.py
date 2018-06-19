@@ -1,6 +1,7 @@
+# coding=utf-8
 import json
 import sys
-
+import  time
 import cv2
 import numpy as np
 from src.FaceRecognition.BaseRecognition import BaseRecognition
@@ -12,13 +13,24 @@ faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征�
 
 class faceNetRecognition(BaseRecognition):
 
-    def __init__(self):
+    def __init__(self,conf):
         '''
         初始化人脸检测接口   人脸特征抽取接口
         '''
         pass
 
-
+    def _cos(self,vector1, vector2):
+        dot_product = 0.0;
+        normA = 0.0;
+        normB = 0.0;
+        for a, b in zip(vector1, vector2):
+            dot_product += a * b
+            normA += a ** 2
+            normB += b ** 2
+        if normA == 0.0 or normB == 0.0:
+            return None
+        else:
+            return dot_product / ((normA * normB) ** 0.5)
 
     def Recognit(self, known_face_dataset, face_encodings, positions):
         '''
@@ -31,12 +43,14 @@ class faceNetRecognition(BaseRecognition):
         '''
 
 
+        self.data_set = known_face_dataset
+
         face_ID = self.findPeople(
             face_encodings, positions, data_set=known_face_dataset)
 
 
 
-        return face_ID
+        return face_ID[0]
 
 
     # def face_locations_encoding(self, image):
@@ -68,6 +82,32 @@ class faceNetRecognition(BaseRecognition):
     #
     #     return np.array(locations), features_arr, positions, image
 
+
+    def mapFunction(self,name):
+
+        t1 = time.time()
+        if name=="UEPEOPLE":
+            return name,0,0.0
+
+        # '61ce9a22-6e0d-11e8-a284-3ca06736b3e1'
+        lib_person = self.data_set[name]['Center']
+
+        if len(lib_person)<1:
+            return name,0,0.0
+        lib_person = lib_person[0]
+        person = self.data_set['UEPEOPLE']
+
+        simi = self._cos(lib_person, person)  # 相似度，越大越相似
+
+        t2 = time.time()
+
+
+        return  name,simi,t2-t1
+
+
+
+
+
     '''
     facerec_128D.txt Data Structure:
     {
@@ -86,8 +126,8 @@ class faceNetRecognition(BaseRecognition):
             features_arr,
             positions,
             data_set=None,
-            thres=0.7,
-            percent_thres=80):
+            thres=0.6,
+            percent_thres=0.75):
         '''
         :param features_arr: a list of 128d Features of all faces on screen
         :param positions: a list of face position types of all faces on screen
@@ -99,20 +139,70 @@ class faceNetRecognition(BaseRecognition):
             f = open('./facerec_128D.txt', 'r')
             data_set = json.loads(f.read())
         returnRes = []
-        for (i, features_128D) in enumerate(features_arr):
-            result = "Unknown"
-            smallest = sys.maxsize
-            for person in data_set.keys():
-                person_data = data_set[person][positions[i]]
-                for data in person_data:
-                    distance = np.sqrt(np.sum(np.square(data - features_128D)))
-                    if distance < smallest:
-                        smallest = distance
-                        result = person
-            percentage = min(100, 100 * thres / smallest)
-            if percentage <= percent_thres:
-                result = "Unknown"
-            returnRes.append((result, percentage))
+        ######################################################
+
+        '''使用map函数优化循环性能测试'''
+        from multiprocessing import Pool
+        from multiprocessing.dummy import Pool as ThreadPool
+
+        pool = ThreadPool(5)
+        for people in features_arr:
+            IDs_lib = list(self.data_set.keys())
+            self.data_set['UEPEOPLE'] = people
+
+            # 相似度列表，用户与人脸库中5000多个的相似度
+            import time
+            t1 = time.time()
+            simi_result = pool.map(self.mapFunction,IDs_lib)
+            t2 = time.time()
+            print("map操作时间：{t}".format(t = (t2 - t1)))
+
+            simi_sort = sorted(simi_result,key= lambda x:x[1],reverse=True)
+            t3 = time.time()
+            print("排序操作时间：{t}".format(t=(t3 - t2)))
+
+            from functools import  reduce
+
+            # def add(x,y):
+            #     resule = x[2] + y[2]
+            #     return resule
+            #
+            # ss = reduce(add,simi_sort)
+
+
+
+
+
+            id,simi_max,_ = simi_sort[0]
+
+            result = id
+            if simi_max < percent_thres:
+                result = 'Unknown'
+            returnRes.append(result)
+
+
+
+
+
+
+
+
+        ######################################################
+        # for (i, features_128D) in enumerate(features_arr):
+        #     result = "Unknown"
+        #     smallest =0.0 #sys.maxsize
+        #     for person in data_set.keys():
+        #         person_data = data_set[person][positions[i]]
+        #         for data in person_data:
+        #             # distance = np.sqrt(np.sum(np.square(data - features_128D)))
+        #             distance =self._cos(data,features_128D)  # 相似度，越大越相似
+        #             if distance > smallest:
+        #                 smallest = distance
+        #                 result = person
+        #     # percentage = min(100, 100 * thres / smallest)
+        #     if smallest <= percent_thres:
+        #         result = "Unknown"
+        #     returnRes.append((result, smallest))
 
 
         return returnRes,

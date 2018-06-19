@@ -6,11 +6,11 @@ import cv2
 import datetime
 from PIL import Image
 from src.Config.Config import Config
-from src.utils.redis_queue import RedisQueue
+
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 
-from src.DrawPicture.DrawFace import Draw
+from src.DrawPicture.DrawFace import ImageUtil
 
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 import  base64
@@ -25,7 +25,7 @@ src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtyp
 vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/20180531.mp4"
 
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(vidwo_path)
+video_capture = cv2.VideoCapture(0)
 
 #
 conf = Config("./Config/config.ini")
@@ -39,7 +39,7 @@ conf = Config("./Config/config.ini")
 # Recognition = faceNetRecognition()  # 人脸识别接口
 faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
 faceFeature = FaceNetExtract(conf) # 人脸特征抽取接口
-draw =Draw(conf)
+draw =ImageUtil(conf)
 jump = True
 #
 # CACHE = set()
@@ -75,7 +75,7 @@ while True:
         #
         # [ymin, xmin, ymax, xmax]
 
-        face_imgs = draw.DrawFace(frame,locations,landmarks)
+        face_imgs = draw.getFaceImgbyLocation(frame, locations) #draw.DrawFace(frame,locations,landmarks)
 
         # 画框
         for location in locations:
@@ -87,16 +87,19 @@ while True:
 
             cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
 
-        cv2.imshow("test", frame)
-        cv2.waitKey(1)
+
+        for head in face_imgs:
+
+
+            cv2.imshow("test", head)
+            cv2.waitKey(1)
 
             # head = frame[xmin:xmax, ymax:ymin]
             #
             # cv2.imshow("test", head)
             # cv2.waitKey(1)
 
-        # cv2.imshow("test", frame)
-        # cv2.waitKey(1)
+
         # Hit 'q' on the keyboard to quit!
 
 

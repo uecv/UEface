@@ -34,6 +34,13 @@ class FaceFeature(object):
 
             saver = tf.train.Saver()  # saver load pretrain model
             saver.restore(self.sess, model_path)
+
+
+
+
+            # summary_write = tf.summary.FileWriter("logdir", self.sess.graph)
+
+
             print("Model loaded")
 
     def get_features(self, input_imgs):
