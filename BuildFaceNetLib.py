@@ -37,26 +37,39 @@ class buildLib:
         self.libraryPath = conf.get("lib","feature.file")
 
     def build(self):
-        data = open(self.libraryPath, 'r').read()
+        isExists = os.path.exists(self.libraryPath)
+        data = []
+        if isExists:
+            data = open(self.libraryPath, 'r').read()
         data_set = {}
         if len(data) > 0:
             data_set = json.loads(data)
         images = os.listdir(self.imagesPath)
         for name_id in images:
             print(name_id)
-            name, id = name_id.split(".")[0].split("_")
-
             imagepath = self.imagesPath + "/" + name_id  # os.path.join(self.imagesPath, name_id)
             # im = cv2.imread(imagepath)
 
+            isdir = os.path.isdir(imagepath)
+
+            if isdir:
+                continue
+            name, id = name_id.split(".")[0].split("-")
             im = cv2.imdecode(np.fromfile(imagepath, dtype=np.uint8), -1)
             im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-            people = perpleDB.People(name, name_id)
-            perpleDB.insert_people(people)
+
 
             # 人脸检测:
             # locations：人脸位置。  landmarks：人脸特征点
             locations, landmarks = faceDetect.detect(im)
+
+            if len(locations) !=1:
+                '''如果在图片中检测到的人脸不止一个，或者为0个，则跳过该人脸'''
+                print("错误的照片{path}".format(path = imagepath))
+                continue
+
+            people = perpleDB.People(name, name_id)
+            perpleDB.insert_people(people)
 
             # ** 人脸特征抽取
             # features_arr：人脸特征    positions：人脸姿态

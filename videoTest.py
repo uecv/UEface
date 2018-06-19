@@ -14,7 +14,7 @@ from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 import time
 from src.DrawPicture.DrawFace import ImageUtil
-
+import  pinyin
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 import  base64
 from io import  BytesIO
@@ -26,7 +26,7 @@ src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtyp
 vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/testVedio.mp4"
 video_path_245 = "testVedio.mp4"
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(vidwo_path)
+video_capture = cv2.VideoCapture(video_path_245)
 video_capture.set(cv2.CAP_PROP_FPS,10)
 #
 conf = Config("./src/Config/config.ini")
@@ -50,12 +50,14 @@ COUNT =0
 
 
 # 获得码率及尺寸
-# fps = video_capture.get(cv2.CAP_PROP_FPS)
-# size = (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
-#         int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-# fourcc = cv2.VideoWriter_fourcc("X","V","I","D")
-# # 指定写视频的格式, I420-avi, MJPG-mp4
-# videoWriter = cv2.VideoWriter('oto_other.mp4', fourcc, fps, size)
+fps = video_capture.get(cv2.CAP_PROP_FPS)
+size = (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+        int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+fourcc = cv2.VideoWriter_fourcc("X","V","I","D")
+# 指定写视频的格式, I420-avi, MJPG-mp4
+videoWriter = cv2.VideoWriter('recognition_5000.mp4', fourcc, fps, size)
+
+
 
 while True:
 
@@ -139,51 +141,54 @@ while True:
     face_id = Recognition.Recognit(known_face_dataset, features_arr, positions)
 
     t3 = (time.time() - start_time)
-    print("到达人脸验证花费的时间{t3}")
-    print(t3)
-    print(face_id)
+    # print("到达人脸验证花费的时间{t3}")
+    # print(t3)
+    # print(face_id)
 
     names = []
 
-    # PY = Pinyin()
-    # for temp in face_id:
-    #     id, simi = temp[0]
-    #     name = "unknown"
-    #     if id != "Unknown":
-    #         name, img_path = get_people(id)
-    #         name = PY.get_pinyin(name)
-    #     names.append(name)
-    # # [ymin, xmin, ymax, xmax]
+
+
+    for temp in face_id:
+        id, simi = temp
+        name = "unknown"
+        if id != "Unknown":
+            name, img_path = get_people(id)
+            name = pinyin.get(name, format="strip", delimiter=" ")
+        names.append(name)
+    # [ymin, xmin, ymax, xmax]
 
 
 
 
-    # face_imgs = draw.getFaceImgbyLocation(frame, locations) #draw.DrawFace(frame,locations,landmarks)
-    #
-    # # 画框
-    # for location, id in zip(locations, names):
-    #     # [ymin, xmin, ymax, xmax]
-    #     ymin = location[0]
-    #     xmin = location[1]
-    #     ymax = location[2]
-    #     xmax = location[3]
-    #
-    #     cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
-    #     font = cv2.FONT_HERSHEY_SIMPLEX  # 定义字体
-    #     #
-    #
-    #     frame = cv2.putText(frame, str(id), (xmin, ymax), font, 1.2, (255, 255, 255), 2)
-    #     # frame = cv2.putText(frame, str(va), (xmin, ymax+10), font, 1.2, (255, 255, 255), 2)
-    # # for head in face_imgs:
-    #
-    #
-    #     """frame 转图片,base64编码"""
-    #     # img = Image.fromarray(head, 'RGB')
-    #     # img.show()
-    #
-    #
+    face_imgs = draw.getFaceImgbyLocation(frame, locations) #draw.DrawFace(frame,locations,landmarks)
+
+    # 画框
+    for location, id in zip(locations, names):
+        print(names)
+
+        # [ymin, xmin, ymax, xmax]
+        ymin = location[0]
+        xmin = location[1]
+        ymax = location[2]
+        xmax = location[3]
+
+        cv2.rectangle(frame, (xmin, ymax), (xmax, ymin), (255, 0, 0))
+        font = cv2.FONT_HERSHEY_SIMPLEX  # 定义字体
+        #
+
+        frame = cv2.putText(frame, str(id), (xmin, ymax), font, 1.2, (255, 255, 255), 2)
+        # frame = cv2.putText(frame, str(va), (xmin, ymax+10), font, 1.2, (255, 255, 255), 2)
+    # for head in face_imgs:
+
+
+        """frame 转图片,base64编码"""
+        # img = Image.fromarray(head, 'RGB')
+        # img.show()
+
+
     # print(face_id)
-    # videoWriter.write(frame)  # 写视频帧
+    videoWriter.write(frame)  # 写视频帧
     # cv2.imshow("test", frame)
     # cv2.waitKey(1)
     #

@@ -40,6 +40,9 @@ class MTCNNDetect(object):
                 onet = ONet({'data': data})
                 onet.load(os.path.join(model_path, 'det3.npy'), self.sess)
 
+
+
+
             self.pnet = lambda img: self.sess.run(('pnet/conv4-2/BiasAdd:0', 'pnet/prob1:0'), feed_dict={'pnet/input:0': img})
             self.rnet = lambda img: self.sess.run(('rnet/conv5-2/conv5-2:0', 'rnet/prob1:0'), feed_dict={'rnet/input:0': img})
             self.onet = lambda img: self.sess.run(('onet/conv6-2/conv6-2:0', 'onet/conv6-3/conv6-3:0', 'onet/prob1:0'),
