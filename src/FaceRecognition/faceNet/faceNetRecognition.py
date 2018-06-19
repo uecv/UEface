@@ -9,7 +9,6 @@ from multiprocessing.dummy import Pool
 # from multiprocessing import Pool
 import  math
 '''
-
 faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征抽取等
 '''
 
