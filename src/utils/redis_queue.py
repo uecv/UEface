@@ -46,7 +46,6 @@ class RedisQueue(object):
 
 
 
-
 if __name__ == '__main__':
     x = RedisQueue(host='192.168.0.245', port=6379)
     print (x.get_nowait('rq'))
