@@ -7,10 +7,12 @@ import uuid
 from sqlalchemy import Column, String,DATETIME
 from sqlalchemy import UniqueConstraint
 import datetime
-from sqlalchemy.dialects.postgresql import UUID
-
 from src.storage import db
 session = db.Session()
+
+
+def generate_uuid():
+    return str(uuid.uuid1())
 
 class People(db.Base):
     __tablename__ = 'people'
@@ -18,8 +20,7 @@ class People(db.Base):
     """
     实体类,对应数据库中people表
     """
-
-    id = Column(UUID, primary_key=True,default=uuid)
+    id = Column(String(36), primary_key=True)
     name = Column(String(20),nullable=False)
     company_id = Column(String(20),nullable=False)
     worker_id = Column(String(20),nullable=False)
@@ -36,9 +37,9 @@ def insert_people(people):
     :param people:
     :return:
     """
+    people.id = generate_uuid()
     session.add(people)
     session.commit()
-
 
 
 def get_peoples():
@@ -59,11 +60,13 @@ def get_people(uuid):
 
 if __name__ == '__main__':
 
-    for i in range(5):
-        uuid = str(uuid.uuid1())
-        p = People(name = 'qwe',worker_id='sdsfsdf',company_id="ue",image_path = 'dsfsd',id=uuid)
-        session.add(p)
-        session.flush()
-    # print(get_peoples())
-    # our_user = session.query(People).filter_by(name='qwe').first()
-    # print(our_user)
+    # 测试循环插入
+    for i in range(0,3):
+        p = People(name = str(i),worker_id='sdsfsdf',company_id="ue",image_path = 'dsfsd')
+        insert_people(p)
+
+    # 查询所有数据
+    print(get_peoples())
+    # 查询个别数据
+    our_user = session.query(People).filter_by(name='qwe').first()
+    print(our_user)
