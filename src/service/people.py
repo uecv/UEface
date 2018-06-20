@@ -60,6 +60,7 @@ def get_people(uuid):
 
 if __name__ == '__main__':
 
+    # 测试循环插入
     for i in range(0,3):
         p = People(name = str(i),worker_id='sdsfsdf',company_id="ue",image_path = 'dsfsd')
         insert_people(p)

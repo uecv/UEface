@@ -1,8 +1,5 @@
 # coding:utf-8
 
-
-
-
 import base64
 import datetime
 import uuid
@@ -16,9 +13,11 @@ from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 from src.utils.redis_queue import RedisQueue
-from src.utils import Constant
+from src.utils import Constant,log
 from src.DrawPicture.DrawFace import ImageUtil
 
+LOG = log.log()
+LOG.debug('this is a test')
 redis_connect = RedisQueue(
     host='192.168.0.245',
     port=6379)
@@ -32,7 +31,7 @@ redis_port = conf.get('web', 'redis_port')
 redis_queue = conf.get('web', 'redis_queue')
 image_path = conf.get('web', 'image_root')
 map_path = conf.get('web', 'map_path')
-# ** 构建人脸特征库对象
+# 构建人脸特征库对象
 facelib = faceNetLib(conf)
 # 人脸特征库
 known_face_dataset = facelib.getlib()
@@ -99,7 +98,7 @@ def filterByCach(dist_name_num):
 
         if num > 10:
             web_faceid.append((id,resultsimis))
-            print(id,resultsimis)
+            LOG.debug('{},{}'.format(id ,resultsimis))
             web_faceimg.append(result_head)
 
     return web_faceid,web_faceimg
@@ -131,7 +130,7 @@ while True:
 
 
 
-        ##############删除掉侧脸的头像###############
+        #==== 删除掉侧脸的头像 =====
 
         newlocation = []
         newPosition = []
@@ -149,14 +148,6 @@ while True:
         features_arr = newFeature
 
 
-        ##############################
-
-
-
-
-
-
-        #Todo 原始帧
         # """frame 转图片,base64编码"""
         # img = Image.fromarray(frame, 'RGB')
         # buffered = BytesIO()
@@ -213,7 +204,7 @@ while True:
                 result_dict['user_id'] = id  # list
                 result_dict['head_image'] = img_head_str  # list
                 result_dict['similarity'] = int(simi)  # list
-                print(time,result_dict['user_id'])
+                LOG.debug(result_dict['user_id'])
                 redis_connect.put(redis_queue,result_dict)
 
             dist_name_num = {}  #清空缓存
