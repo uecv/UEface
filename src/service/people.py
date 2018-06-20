@@ -5,6 +5,7 @@
 """
 import uuid
 from sqlalchemy import Column, String,DATETIME
+from sqlalchemy import UniqueConstraint
 import datetime
 from src.storage import db
 session = db.Session()
@@ -17,12 +18,14 @@ class People(db.Base):
     """
     id = Column(String(36),default=uuid.uuid1(), primary_key=True)
     name = Column(String(20),nullable=False)
-    worker_id = Column(String(20))
+    company_id = Column(String(20),nullable=False)
+    worker_id = Column(String(20),nullable=False)
     image_path = Column(String(100),nullable=False)
     create_time = Column(DATETIME,default=datetime.datetime.utcnow)
+    UniqueConstraint('name', 'company_id','worker_id', name='uix_people')
 
     def __repr__(self):
-        return "People(%s,%s,%s,%s)" %(str(self.id),self.name,self.worker_id,self.image_path)
+        return "People(%s,%s,%s,%s,%s)" %(str(self.id),self.name,self.company_id,self.worker_id,self.image_path)
 
 def insert_people(people):
     """
@@ -52,7 +55,7 @@ def get_people(uuid):
 
 
 if __name__ == '__main__':
-    p = People(name = 'qwe',image_path = 'dsfsd')
+    p = People(name = 'qwe',worker_id='sdsfsdf',company_id="ue",image_path = 'dsfsd')
     session.add(p)
     session.commit()
     print(get_peoples())
