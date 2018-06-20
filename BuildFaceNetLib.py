@@ -3,9 +3,11 @@
 '''
 创建人脸特征库
 '''
+from io import BytesIO
 import json
 import  time
 import os
+import base64
 import cv2
 import numpy
 from src.Config.Config import Config
@@ -15,7 +17,7 @@ from src.service import people as perpleDB
 import numpy as np
 from src.utils import Constant
 
-from src.service.features import Feature,insert_feature
+from src.service import  features as featureDB
 
 
 class NPEncoder(json.JSONEncoder):
@@ -38,34 +40,37 @@ class buildLib:
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
         self.imagesPath = conf.get("lib","imagepath")
-        self.libraryPath = conf.get("lib","feature.file")
+        # self.libraryPath = conf.get("lib","feature.file")
 
     def build(self):
-        isExists = os.path.exists(self.libraryPath)
-        data = []
-        if isExists:
-            data = open(self.libraryPath, 'r').read()
-        data_set = {}
-        if len(data) > 0:
-            data_set = json.loads(data)
+        # isExists = os.path.exists(self.libraryPath)
+        # data = []
+        # if isExists:
+        #     data = open(self.libraryPath, 'r').read()
+        # data_set = {}
+        # if len(data) > 0:
+        #     data_set = json.loads(data)
+        error=[]
         Companys = os.listdir(self.imagesPath)
         for company in Companys: # 遍历该目录下的所有公司
-
-            companypath = self.imagesPath + "/" + company  # os.path.join(self.imagesPath, name_id)
-            # im = cv2.imread(imagepath)
+            if company =="lfw":
+                continue
+            companypath = self.imagesPath + "/" + company
 
             isdir = os.path.isdir(companypath)
-
             if not isdir:
                 continue
-
             images = os.listdir(companypath)
-
             for name_id in images:
-
                 imagepath = os.path.join(companypath,name_id)
+                print(name_id)
 
-                name, worker_id = name_id.split(".")[0].split("-")
+                ss =  name_id.split(".")[0].split("-")
+                if len(ss)!=2:
+                    error.append(name_id)
+                    continue
+                name, worker_id = ss
+
                 im = cv2.imdecode(np.fromfile(imagepath, dtype=np.uint8), -1)
                 im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 
@@ -79,31 +84,32 @@ class buildLib:
                     print("错误的照片{path}".format(path = imagepath))
                     continue
 
+                people = perpleDB.People(name=name, image_path=name_id,company_id=company,worker_id=worker_id)
 
-                # people = perpleDB.People(name=name, image_path=name_id,company_id=company,worker_id=worker_id)
-                # print(people.id)
-                # perpleDB.insert_people(people)
+                dbasePeople = perpleDB.getfilterPeople(people)
+
+                if len(dbasePeople)>0: #如果数据中，已经存在该用户的特征，则不需要再次进行特征抽取。（公司id，用户工号，名称）相等
+                    continue
+
+                perpleDB.insert_people(people)
 
                 # ** 人脸特征抽取
                 # features_arr：人脸特征    positions：人脸姿态
                 features_arr, positions = faceFeature.Extract(im, locations, landmarks)
-                person_features = {"Left": [], "Right": [], "Center": []}
-                for pos in person_features:
-                    person_features[pos] = features_arr
-
+                # person_features = {"Left": [], "Right": [], "Center": []}
+                # for pos in person_features:
+                #     person_features[pos] = features_arr
+                #
                 # data_set[people.id] = person_features
+                feature_str = base64.b64encode(features_arr.tostring()).decode("utf-8")
 
-                str1 = features_arr.tostring()
+                featurebean = featureDB.Feature(people_id=people.id,feature=feature_str)
+                featureDB.insert_feature(featurebean)
+        print(error)
 
-                test = np.fromstring(str1,dtype=np.float32)
-
-                featurebean = Feature(people_id=1,feature=features_arr.tostring())
-                insert_feature(featurebean)
-
-
-        f = open(self.libraryPath, 'w')
-        f.write(json.dumps(data_set, cls=NPEncoder))
-        f.close()
+        # f = open(self.libraryPath, 'w')
+        # f.write(json.dumps(data_set, cls=NPEncoder))
+        # f.close()
 
 
 if __name__ == '__main__':

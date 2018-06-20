@@ -5,7 +5,7 @@ from sqlalchemy import Column, String,DATETIME,Integer
 from sqlalchemy.dialects.mysql import  LONGTEXT
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
-
+import  base64
 import datetime
 import  pandas as pd
 import numpy as np
@@ -41,16 +41,15 @@ def insert_feature(feature):
 
 
 def getFeature():
-
     featuredf = pd.read_sql('feature',db.engine).infer_objects()
+    QueryDist = dict(zip(featuredf['people_id'],featuredf['feature']))
+    result= {}
+    for key in QueryDist:
+        strs = QueryDist[key]
+        basess  = base64.b64decode(strs)
+        value = np.fromstring(basess,dtype=np.float32)
+        result[key]=value
 
-
-    result = dict(zip(featuredf['people_id'],featuredf['feature']))
-
-    for key in result:
-        str = result[key]
-        tt = np.fromstring(str,dtype=np.float32)
-        print("success")
 
     return result
 

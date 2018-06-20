@@ -85,12 +85,11 @@ class faceNetRecognition(BaseRecognition):
         if name=="UEPEOPLE":
             return name,0,0.0
 
-        # '61ce9a22-6e0d-11e8-a284-3ca06736b3e1'
-        lib_person = self.data_set[name]['Center']
 
-        if len(lib_person)<1:
-            return name,0,0.0
-        lib_person = lib_person[0]
+        lib_person = self.data_set[name]
+
+
+
         person = self.data_set['UEPEOPLE']
         t1 = time.time()
         simi = self._cos(lib_person, person)  # 相似度，越大越相似
@@ -127,9 +126,7 @@ class faceNetRecognition(BaseRecognition):
         istance threshold
         :return: person name and percentage
         '''
-        if data_set is None:
-            f = open('./facerec_128D.txt', 'r')
-            data_set = json.loads(f.read())
+
         returnRes = []
         ######################################################
 
