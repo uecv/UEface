@@ -1,5 +1,4 @@
-#coding:utf-8
-
+# coding:utf-8
 '''
 创建人脸特征库
 '''
