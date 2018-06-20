@@ -26,7 +26,7 @@ class People(db.Base):
     worker_id = Column(String(20),nullable=False)
     image_path = Column(String(100),nullable=False)
     create_time = Column(DATETIME,default=datetime.datetime.utcnow)
-    UniqueConstraint('name', 'company_id','worker_id', name='uix_people')
+    UniqueConstraint(name, company_id,worker_id, name='uix_people')
 
     def __repr__(self):
         return "People(%s,%s,%s,%s,%s)" %(str(self.id),self.name,self.company_id,self.worker_id,self.image_path)
