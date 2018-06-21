@@ -55,18 +55,19 @@ def get_people(uuid):
     返回人脸信息
     :return:
     """
-    return session.query(People(uuid=uuid)).fist()
+    return session.query(People).filter(People.id==uuid).first()
 
 
 if __name__ == '__main__':
+    print (get_people('c156d398-746d-11e8-a5d5-88d7f69262f6'))
 
-    # 测试循环插入
-    for i in range(0,3):
-        p = People(name = str(i),worker_id='sdsfsdf',company_id="ue",image_path = 'dsfsd')
-        insert_people(p)
+    # # 测试循环插入
+    # for i in range(0,3):
+    #     p = People(name = str(i),worker_id='sdsfsdf',company_id="ue",image_path = 'dsfsd')
+    #     insert_people(p)
 
     # 查询所有数据
-    print(get_peoples())
-    # 查询个别数据
-    our_user = session.query(People).filter_by(name='qwe').first()
-    print(our_user)
+    # print(get_peoples())
+    # # 查询个别数据
+    # our_user = session.query(People).filter_by(name='qwe').first()
+    # print(our_user)

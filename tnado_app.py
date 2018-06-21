@@ -108,16 +108,16 @@ class CamHandler(tornado.web.RequestHandler):
             "camera": [{
                 "name": "摄像头A",
                 "id": 1,
-                # "url": "http://192.168.0.245/livestream.flv",
-                "url":"http://live.useease.cn/live/livestream.flv?auth_key=1528085627-0-0-f02ebe40a90f099cb2c9b7a8c64b7f63",
+                "url": "http://192.168.0.245/livestream.flv",
+                # "url":"http://live.useease.cn/live/livestream.flv?auth_key=1528096827-0-0-7a54cf956bee59637d10309a96b2969a",
                 "x": 30,
                 "y": 50
             },
                 {
                     "name": "摄像头B",
                     "id": 2,
-                    # "url": "http://192.168.0.245/livestream.flv",
-                    "url": "http://live.useease.cn/live/livestream.flv?auth_key=1528085627-0-0-f02ebe40a90f099cb2c9b7a8c64b7f63",
+                    "url": "http://192.168.0.245/livestream.flv",
+                    # "url": "http://live.useease.cn/live/livestream.flv?auth_key=1528096827-0-0-7a54cf956bee59637d10309a96b2969a",
                     "x": 70,
                     "y": 80,
             }]
