@@ -40,7 +40,7 @@ def build(path):
             pil_im = Image.fromarray(cv2_rgb)
             pil_im = pil_im.rotate(45, expand=1)
             draw = ImageDraw.Draw(pil_im)
-            font = ImageFont.truetype("simhei.ttf", 10, encoding="utf-8")
+            font = ImageFont.truetype("simhei.ttf", 30, encoding="utf-8")
             draw.text((0, center_height), "只用于优亿科技人脸识别项目，只用于优亿科技人脸识别项目，只用于优亿科技人脸识别项目，只用于优亿科技人脸识别项目", (160, 160, 160), font=font)
             pil_im = pil_im.rotate(-45, expand=0)
 
@@ -62,7 +62,9 @@ def build(path):
 
             writePath =os.path.join("WatermarkImage/",imagePath)
 
-            cv2.imwrite(writePath,cv2_tex_im)
+            # cv2.imwrite(writePath,cv2_tex_im)
+
+            cv2.imencode(".jpg",cv2_tex_im)[1].tofile(writePath)
 
             count+=1
             print(count)
@@ -72,4 +74,4 @@ def build(path):
 
 
 if __name__ == '__main__':
-    build("images/lfw/")
+    build("images/")
