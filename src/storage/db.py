@@ -6,7 +6,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-engine = create_engine('mysql://root:ueface@192.168.0.245:3306/ueface?charset=utf8' , encoding="utf-8" , echo=True)
-Base = declarative_base()
+engine = create_engine('mysql://root:ueface@192.168.0.245:3306/ueface' , encoding="utf-8" , echo=True)
+#engine = create_engine('mysql://root:ueface@192.168.0.245:3306/testwy' , encoding="utf-8" , echo=True)
 #engine = create_engine('mysql://root:ueface@192.168.0.10:3306/ueface' , encoding="utf-8" , echo=True)
+Base = declarative_base()
 Session = sessionmaker(bind=engine)
