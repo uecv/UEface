@@ -15,6 +15,10 @@ from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 from src.utils.redis_queue import RedisQueue
 from src.utils import Constant,log
 from src.DrawPicture.DrawFace import ImageUtil
+from pyspark import  SparkContext
+
+sc = SparkContext("local")
+
 
 LOG = log.log()
 LOG.debug('this is a test')
