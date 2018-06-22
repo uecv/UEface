@@ -41,7 +41,7 @@ def insert_feature(feature):
 
 
 def getFeature():
-    featuredf = pd.read_sql('feature',db.engine).infer_objects()
+    featuredf = pd.read_sql('feature',db.engine)
     QueryDist = dict(zip(featuredf['people_id'],featuredf['feature']))
     result= {}
     for key in QueryDist:
