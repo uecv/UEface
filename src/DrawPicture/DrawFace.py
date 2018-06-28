@@ -20,12 +20,32 @@ class ImageUtil():
 
         result =[]
 
+        image_shape = image.shape
+
+        Image_Xmax = image[0]
+        Image_Ymax = image[1]
+
+        X_rate = int(Image_Xmax * 0.1)
+        Y_rate = int(Image_Ymax * 0.1)
 
         for location in locations:
-            ymin = location[0]-5
-            xmin = location[1]-5
-            ymax = location[2]+5
-            xmax = location[3]+5
+
+
+
+
+            ymax = location[0] + Y_rate
+            xmin = location[1] - X_rate
+            ymin = location[2] - Y_rate
+            xmax = location[3] + X_rate
+
+            if ymin<0:
+                ymin = 0
+            if xmin<0:
+                xmin = 0
+            if xmax>Image_Xmax:
+                xmax = Image_Xmax
+            if ymax > Image_Ymax:
+                ymax = Image_Ymax
 
             # box = (xmin,ymax,xmax,ymin)
             # pil_image = Image.fromarray(image)

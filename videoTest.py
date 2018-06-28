@@ -23,10 +23,10 @@ from io import  BytesIO
 # q = RedisQueue(name="sb",host='192.168.0.245', port=6379, db=0) #RedisQueue('rq')  # 新建队列名为rq
 src = "rtsp://admin:qwe123456@192.168.0.202:554/cam/realmonitor?channel=1&subtype=0"
 
-vidwo_path ="E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/testVedio.mp4"
+vidwo_path = 'new.mp4' #"E:/优异科技/人类识别数据检测平台/人脸识别项目Git管理/testVedio.mp4"
 video_path_245 = "testVedio.mp4"
 src1807 = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(video_path_245)
+video_capture = cv2.VideoCapture(vidwo_path)
 video_capture.set(cv2.CAP_PROP_FPS,10)
 #
 conf = Config("./src/Config/config.ini")
@@ -148,12 +148,14 @@ while True:
     names = []
 
 
-
     for temp in face_id:
         id, simi = temp
         name = "unknown"
         if id != "Unknown":
-            name, img_path = get_people(id)
+            people_bean = get_people(id)
+            name = people_bean.name
+            img_path = people_bean.image_path
+            # name, img_path = get_people(id)
             name = pinyin.get(name, format="strip", delimiter=" ")
         names.append(name)
     # [ymin, xmin, ymax, xmax]
@@ -188,7 +190,7 @@ while True:
 
 
     # print(face_id)
-    videoWriter.write(frame)  # 写视频帧
+    # videoWriter.write(frame)  # 写视频帧
     # cv2.imshow("test", frame)
     # cv2.waitKey(1)
     #
@@ -198,9 +200,9 @@ while True:
     #
     #     # head = frame[xmin:xmax, ymax:ymin]
     #     #
-    # # cv2.imshow("test", frame)
-    # # cv2.waitKey(1)
-    #
+    cv2.imshow("test", frame)
+    cv2.waitKey(1)
+
     #
     # # Hit 'q' on the keyboard to quit!
 

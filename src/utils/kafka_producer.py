@@ -14,7 +14,7 @@ import time
 import io
 
 src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(src)
+video_capture = cv2.VideoCapture(0)
 #创建kafka实例
 producer = KafkaProducer(bootstrap_servers='192.168.0.245:9092',max_request_size=4000000,api_version = (0, 10))
 

@@ -15,9 +15,9 @@ from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
 from src.utils.redis_queue import RedisQueue
 from src.utils import Constant,log
 from src.DrawPicture.DrawFace import ImageUtil
-from pyspark import  SparkContext
 
-sc = SparkContext("local")
+
+
 
 
 LOG = log.log()
@@ -27,7 +27,7 @@ redis_connect = RedisQueue(
     port=6379)
 
 src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture('new.mp4')
 # video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 conf = Config.Config(Constant.CONFIG_PATH)
 redis_host = conf.get('web', 'redis_host')
@@ -94,7 +94,7 @@ def filterByCach(dist_name_num):
 
         num,head_images,simis = dist_name_num[id]
 
-        resultsimis = np.mean(simis)
+        resultsimis = np.mean(simis) * 100
 
         maxsimi_index = simis.index(max(simis))
 
@@ -211,7 +211,11 @@ while True:
                 LOG.debug(result_dict['user_id'])
                 redis_connect.put(redis_queue,result_dict)
 
+                LOG.info("redis 存储成功！")
+
             dist_name_num = {}  #清空缓存
 
             countFrame = 0 #重新开始计数
 
+        cv2.imshow("test",frame)
+        cv2.waitKey(1)
