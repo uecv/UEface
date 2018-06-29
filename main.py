@@ -188,8 +188,8 @@ while True:
                 id, simi=id_simi
                 if id == "Unknown":
                     continue
-                if redis_connect.exists_key(id):
-                    continue
+                # if redis_connect.exists_key(id):
+                #     continue
 
                 head_img = Image.fromarray(head_image, 'RGB')
                 buffered = BytesIO()
@@ -198,7 +198,7 @@ while True:
 
 
                 # CACHE.add(id)
-                redis_connect.time_key(id, simi, 20)
+                # redis_connect.time_key(id, simi, 20)
                 result_dict['id'] = str(uuid.uuid4())
                 result_dict['ts'] = time
                 result_dict['user_id'] = id  # list
