@@ -1,52 +1,59 @@
 # coding:utf-8
 
-
-
-
-import base64
 import datetime
-import uuid
-from io import BytesIO
-import  numpy as np
+import os
+
 import cv2
-from PIL import Image
+import numpy as np
+
 from src.Config import Config
+from src.DrawPicture.DrawFace import ImageUtil
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
+from src.service import people
+from src.utils import log
 from src.utils.redis_queue import RedisQueue
-from src.utils import Constant
-from src.DrawPicture.DrawFace import ImageUtil
+from settings import *
 
-redis_connect = RedisQueue(
-    host='192.168.0.245',
-    port=6379)
 
-src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(0)
-# video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
-conf = Config.Config(Constant.CONFIG_PATH)
+"""
+
+source_path = conf.get("")
 redis_host = conf.get('web', 'redis_host')
 redis_port = conf.get('web', 'redis_port')
 redis_queue = conf.get('web', 'redis_queue')
 image_path = conf.get('web', 'image_root')
 map_path = conf.get('web', 'map_path')
-# ** 构建人脸特征库对象
-facelib = faceNetLib(conf)
+"""
+
+LOG = log.log()
+LOG.debug('this is a test')
+redis_connect = RedisQueue(
+    host=redis_host,
+    port=redis_port)
+
+#src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
+video_capture = cv2.VideoCapture(source_path)
+# video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
+
+
+# 构建人脸特征库对象
+facelib = faceNetLib(faceLibPath)
 # 人脸特征库
 known_face_dataset = facelib.getlib()
 
-ss = known_face_dataset["61ce9a22-6e0d-11e8-a284-3ca06736b3e1"]
+
 
 # 人脸识别接口
-Recognition = faceNetRecognition(conf)
+Recognition = faceNetRecognition()
 # 人脸 检测接口
-faceDetect = MTCNNDetection(conf)
+faceDetect = MTCNNDetection(mtcnnDeteModel)
 # 人脸特征抽取接口
-faceFeature = FaceNetExtract(conf)
+faceFeature = FaceNetExtract(faceNetModel)
 
-imageUtil = ImageUtil(conf)                    # 人脸抠图的接口
+imageUtil = ImageUtil()                    # 人脸抠图的接口
 
 jump = True
 
@@ -54,6 +61,9 @@ jump = True
 dist_name_num ={}
 
 countFrame =0
+
+seq_num =0
+
 
 def addFrame2Cach(face_id, face_image, dist_id_num):
     '''
@@ -97,9 +107,9 @@ def filterByCach(dist_name_num):
 
         result_head = head_images[maxsimi_index]
 
-        if num > 10:
+        if num > 5:
             web_faceid.append((id,resultsimis))
-            print(id,resultsimis)
+            LOG.debug('{},{}'.format(id ,resultsimis))
             web_faceimg.append(result_head)
 
     return web_faceid,web_faceimg
@@ -110,7 +120,7 @@ while True:
     # 获取一帧视频
     # start_time = datetime.datetime.now()
     ret, frame = video_capture.read()
-    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+    #frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
 
     # Todo 判断那一帧进入识别流程
@@ -131,7 +141,24 @@ while True:
 
 
 
-        #Todo 原始帧
+        #==== 删除掉侧脸的头像 =====
+
+        newlocation = []
+        newPosition = []
+        newFeature  = []
+
+        for location,position,feature in zip(locations,positions,features_arr):
+
+            if position=="Center":
+                newlocation.append(location)
+                newPosition.append(position)
+                newFeature.append(feature)
+
+        locations = newlocation
+        positions = newPosition
+        features_arr = newFeature
+
+
         # """frame 转图片,base64编码"""
         # img = Image.fromarray(frame, 'RGB')
         # buffered = BytesIO()
@@ -167,14 +194,22 @@ while True:
         if clear:
 
             web_ids,web_headimages = filterByCach(dist_name_num)
-
+            seq_num+=1
             for (id_simi,head_image) in zip(web_ids,web_headimages):
                 id, simi=id_simi
                 if id == "Unknown":
                     continue
-                if redis_connect.exists_key(id):
-                    continue
+                # if redis_connect.exists_key(id):
+                #     continue
+                p = people.get_people(id)
+                im_name = os.path.join("/home/kenwood/UEface/result",str(seq_num)+p.name+".png")
+                LOG.debug('{}'.format(im_name))
+                cv2.imwrite(im_name,head_image)
 
+
+
+
+                """
                 head_img = Image.fromarray(head_image, 'RGB')
                 buffered = BytesIO()
                 head_img.save(buffered, format="JPEG")
@@ -182,15 +217,15 @@ while True:
 
 
                 # CACHE.add(id)
-                redis_connect.time_key(id, simi, 20)
+                # redis_connect.time_key(id, simi, 20)
                 result_dict['id'] = str(uuid.uuid4())
                 result_dict['ts'] = time
                 result_dict['user_id'] = id  # list
                 result_dict['head_image'] = img_head_str  # list
                 result_dict['similarity'] = int(simi)  # list
-                print(time,result_dict['user_id'])
+                LOG.debug(result_dict['user_id'])
                 redis_connect.put(redis_queue,result_dict)
-
+                """
             dist_name_num = {}  #清空缓存
 
             countFrame = 0 #重新开始计数

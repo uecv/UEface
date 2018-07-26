@@ -12,5 +12,8 @@
 */*.iml
 .idea/
 *.iml
+src/Model/*
+src/library/*
+**/*.pyc
 out
 src/storage/__pycache__/
