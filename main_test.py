@@ -1,51 +1,58 @@
 # coding:utf-8
 
-import base64
 import datetime
-import uuid
-from io import BytesIO
-import  numpy as np
+import os
+
 import cv2
-from PIL import Image
-from src.Config import Config
+import numpy as np
+
+from src.DrawPicture.DrawFace import ImageUtil
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
+from src.service import people
+from src.utils import log
 from src.utils.redis_queue import RedisQueue
-from src.utils import Constant,log
-from src.DrawPicture.DrawFace import ImageUtil
+from settings import *
 
-LOG = log.log()
-LOG.debug('this is a test')
-redis_connect = RedisQueue(
-    host='192.168.0.245',
-    port=6379)
 
-src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-video_capture = cv2.VideoCapture(0)
-# video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
-conf = Config.Config(Constant.CONFIG_PATH)
+"""
+
+source_path = conf.get("")
 redis_host = conf.get('web', 'redis_host')
 redis_port = conf.get('web', 'redis_port')
 redis_queue = conf.get('web', 'redis_queue')
 image_path = conf.get('web', 'image_root')
 map_path = conf.get('web', 'map_path')
+"""
+
+LOG = log.log()
+LOG.debug('this is a test')
+redis_connect = RedisQueue(
+    host=redis_host,
+    port=redis_port)
+
+#src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
+video_capture = cv2.VideoCapture(source_path)
+# video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
+
+
 # 构建人脸特征库对象
-facelib = faceNetLib(conf)
+facelib = faceNetLib(faceLibPath)
 # 人脸特征库
 known_face_dataset = facelib.getlib()
 
 
 
 # 人脸识别接口
-Recognition = faceNetRecognition(conf)
+Recognition = faceNetRecognition()
 # 人脸 检测接口
-faceDetect = MTCNNDetection(conf)
+faceDetect = MTCNNDetection(mtcnnDeteModel)
 # 人脸特征抽取接口
-faceFeature = FaceNetExtract(conf)
+faceFeature = FaceNetExtract(faceNetModel)
 
-imageUtil = ImageUtil(conf)                    # 人脸抠图的接口
+imageUtil = ImageUtil()                    # 人脸抠图的接口
 
 jump = True
 
@@ -53,6 +60,9 @@ jump = True
 dist_name_num ={}
 
 countFrame =0
+
+seq_num =0
+
 
 def addFrame2Cach(face_id, face_image, dist_id_num):
     '''
@@ -96,7 +106,7 @@ def filterByCach(dist_name_num):
 
         result_head = head_images[maxsimi_index]
 
-        if num > 10:
+        if num > 5:
             web_faceid.append((id,resultsimis))
             LOG.debug('{},{}'.format(id ,resultsimis))
             web_faceimg.append(result_head)
@@ -109,7 +119,7 @@ while True:
     # 获取一帧视频
     # start_time = datetime.datetime.now()
     ret, frame = video_capture.read()
-    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+    #frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
 
     # Todo 判断那一帧进入识别流程
@@ -183,14 +193,22 @@ while True:
         if clear:
 
             web_ids,web_headimages = filterByCach(dist_name_num)
-
+            seq_num+=1
             for (id_simi,head_image) in zip(web_ids,web_headimages):
                 id, simi=id_simi
                 if id == "Unknown":
                     continue
                 # if redis_connect.exists_key(id):
                 #     continue
+                p = people.get_people(id)
+                im_name = os.path.join("/home/kenwood/UEface/result",str(seq_num)+p.name+".png")
+                LOG.debug('{}'.format(im_name))
+                cv2.imwrite(im_name,head_image)
 
+
+
+
+                """
                 head_img = Image.fromarray(head_image, 'RGB')
                 buffered = BytesIO()
                 head_img.save(buffered, format="JPEG")
@@ -206,7 +224,7 @@ while True:
                 result_dict['similarity'] = int(simi)  # list
                 LOG.debug(result_dict['user_id'])
                 redis_connect.put(redis_queue,result_dict)
-
+                """
             dist_name_num = {}  #清空缓存
 
             countFrame = 0 #重新开始计数

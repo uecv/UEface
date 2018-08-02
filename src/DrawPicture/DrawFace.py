@@ -10,7 +10,7 @@ class ImageUtil():
     获取图片中的头像
     '''
 
-    def __init__(self,conf):
+    def __init__(self):
         FRGraph = FaceRecGraph()
 
         self._aligner = AlignCustom()

@@ -1,13 +1,9 @@
-#!/usr/bin/env Python
-# coding=utf-8
+# coding:utf-8
 '''
 创建人脸特征库
 '''
-from io import BytesIO
 import json
-import  time
 import os
-import base64
 import cv2
 import numpy
 from src.Config.Config import Config
@@ -16,9 +12,6 @@ from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.service import people as perpleDB
 import numpy as np
 from src.utils import Constant
-
-from src.service import  features as featureDB
-
 
 class NPEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -35,11 +28,10 @@ class buildLib:
     """
     what,how
     """
-    def __init__(self, conf,faceFeatureModel, faceDetect):
-        self.conf = conf
+    def __init__(self,faceFeatureModel, faceDetect):
         self.faceFeatureModel = faceFeatureModel
         self.faceDetect = faceDetect
-        self.imagesPath = conf.get("lib","imagepath")
+        self.imagesPath =  image_path #conf.get("lib","imagepath")
         # self.libraryPath = conf.get("lib","feature.file")
 
     def build(self):
@@ -113,10 +105,9 @@ class buildLib:
 
 
 if __name__ == '__main__':
-    conf = Config(Constant.CONFIG_PATH)
     # ** 构建人脸特征库对象
-    faceFeature = FaceNetExtract(conf)  # 人脸特征抽取接口
-    faceDetect = MTCNNDetection(conf)  # 人脸 检测接口
+    faceFeature = FaceNetExtract()  # 人脸特征抽取接口
+    faceDetect = MTCNNDetection()  # 人脸 检测接口
 
-    buildL = buildLib(conf, faceFeature, faceDetect)
+    buildL = buildLib(faceFeature, faceDetect)
     buildL.build()

@@ -5,13 +5,10 @@
    @time: 18-6-20 上午9:56  
 """
 import logging
-from src.Config import Config
-from src.utils import Constant
-conf = Config.Config(Constant.CONFIG_PATH)
+from settings import *
 
-
-LOG_LEVEL = conf.get('log', 'log_level')
-LOG_DIR = conf.get('log','log_dir')
+LOG_LEVEL = log_level
+LOG_DIR = log_dir
 # LOG_LEVEL = 'debug'
 # LOG_DIR = './logs'
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

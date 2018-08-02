@@ -52,8 +52,8 @@ cap_time DATETIME not null comment '被捕捉到的时间',
 create_time DATETIME DEFAULT CURRENT_TIMESTAMP  comment '创建时间',
 description VARCHAR(100)  comment '备注'
 ) comment='识别结果表';
-
 */
+
 
 
 

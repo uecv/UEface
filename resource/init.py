@@ -11,8 +11,5 @@ from src.service.people import  People
 
 # 创建表
 # from src.service.features import Feature
-
-
-def intidb():
-    db.Base.metadata.create_all(db.engine)
+db.Base.metadata.create_all(db.engine)
 

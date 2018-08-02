@@ -15,7 +15,7 @@ faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征�
 
 class faceNetRecognition(BaseRecognition):
 
-    def __init__(self,conf):
+    def __init__(self):
         '''
         初始化人脸检测接口   人脸特征抽取接口
         '''

@@ -8,21 +8,23 @@ import base64
 import datetime
 import uuid
 from io import BytesIO
-import  numpy as np
+
 import cv2
+import numpy as np
 from PIL import Image
+from kafka import KafkaConsumer
+from pyspark import SparkContext, SparkConf
+from pyspark.streaming import StreamingContext
+
+import Constant
 from src.Config import Config
+from src.DrawPicture.DrawFace import ImageUtil
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
 from src.FaceRecognition.faceNet.faceNetRecognition import faceNetRecognition
 from src.library.faceNetLib.faceNetFeatureLib import faceNetLib
+from src.utils import log
 from src.utils.redis_queue import RedisQueue
-from src.utils import log,Constant
-from src.DrawPicture.DrawFace import ImageUtil
-from src.Config.settings import faceLibPath,mtcnnDeteModel,faceNetModel
-from pyspark import SparkContext,SparkConf
-from pyspark.streaming import StreamingContext
-from kafka import KafkaConsumer
 
 #create spark context
 conf = (SparkConf().setAppName("PythonSparkStreamingKafka"))

@@ -12,6 +12,7 @@ from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
 import  cv2
 from src.FaceFeature.BaseFaceFeature import BaseFaceFeature
+from settings import *
 
 class FaceNetExtract(BaseFaceFeature):
 
@@ -19,7 +20,7 @@ class FaceNetExtract(BaseFaceFeature):
         FRGraph = FaceRecGraph()
         self._model = FaceFeature(
             FRGraph,
-            model_path=conf.get("path","faceNetModel"))
+            model_path=faceNetModel)
         self._aligner = AlignCustom()
 
 
