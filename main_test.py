@@ -6,7 +6,6 @@ import os
 import cv2
 import numpy as np
 
-from src.Config import Config
 from src.DrawPicture.DrawFace import ImageUtil
 from src.FaceDetection.MTCNNDetection import MTCNNDetection
 from src.FaceFeature.FaceNet.FaceNetExtract import FaceNetExtract
@@ -113,6 +112,7 @@ def filterByCach(dist_name_num):
             web_faceimg.append(result_head)
 
     return web_faceid,web_faceimg
+
 
 
 while True:

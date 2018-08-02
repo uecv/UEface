@@ -1,8 +1,9 @@
 
 import  json
+from settings import *
 class  faceNetLib:
     def __init__(self,conf):
-        self._path = conf.get("path","faceLibPath")
+        self._path = faceLibPath
 
 
 

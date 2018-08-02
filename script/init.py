@@ -10,6 +10,6 @@ import src.storage.db as db
 from src.service.people import  People
 
 
-
-db.Base.metadata.create_all(db.engine)
+def intidb():
+    db.Base.metadata.create_all(db.engine)
 

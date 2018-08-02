@@ -1,5 +1,5 @@
-create database ueface;
-
+CREATE DATABASE IF NOT EXISTS ueface DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+/*
 create table people
 (
 id varchar(36) primary key not null comment '主键',
@@ -53,7 +53,7 @@ create_time DATETIME DEFAULT CURRENT_TIMESTAMP  comment '创建时间',
 description VARCHAR(100)  comment '备注'
 ) comment='识别结果表';
 
-
+*/
 
 
 
