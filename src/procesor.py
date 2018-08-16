@@ -32,7 +32,7 @@ redis_connect = RedisQueue(
     host=redis_host,
     port=redis_port)
 
-dist_name_num ={}
+
 
 
 def addFrame2Cach(face_id, face_image, dist_id_num):
@@ -56,7 +56,7 @@ def addFrame2Cach(face_id, face_image, dist_id_num):
             k = dist_id_num[id][0]
             dist_id_num[id][0] = dist_id_num[id][0] + 1
             dist_id_num[id][1].append(img)
-            dist_name_num[id][2].append(simi)
+            dist_id_num[id][2].append(simi)
 
 
 
@@ -86,9 +86,11 @@ def filterByCach(dist_name_num):
 
 def process():
     #src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
+    LOG.info(source_path)
     video_capture = cv2.VideoCapture(source_path)
     # video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 
+    dist_name_num ={}
     # 构建人脸特征库对象
     facelib = faceNetLib(faceLibPath)
     # 人脸特征库

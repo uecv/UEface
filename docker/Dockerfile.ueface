@@ -1,0 +1,6 @@
+FROM centos:7
+
+ADD UEface /UEface
+
+RUN /UEface
+    

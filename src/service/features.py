@@ -1,15 +1,14 @@
 # coding=utf-8
 
-import uuid
-from sqlalchemy import Column, String,DATETIME,Integer
-from sqlalchemy.dialects.mysql import  LONGTEXT
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
-import  base64
-import datetime
-import  pandas as pd
+import base64
+
 import numpy as np
+import pandas as pd
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.dialects.mysql import LONGTEXT
+
 from src.storage import db
+
 session = db.Session()
 
 class Feature(db.Base):
@@ -27,7 +26,7 @@ class Feature(db.Base):
     feature = Column(LONGTEXT)
 
     def __repr__(self):
-        return "People(%s,%s,%s)" %(str(self.id),self.people_id,self.feature)
+        return "Feature(%s,%s,%s)" %(str(self.id),self.people_id,self.feature)
 
 
 def insert_feature(feature):

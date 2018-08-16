@@ -20,9 +20,9 @@ class faceNetRecognition(BaseRecognition):
         pass
 
     def _cos(self,vector1, vector2):
-        dot_product = 0.0;
-        normA = 0.0;
-        normB = 0.0;
+        dot_product = 0.0
+        normA = 0.0
+        normB = 0.0
         for a, b in zip(vector1, vector2):
             dot_product += a * b
             normA += a ** 2
