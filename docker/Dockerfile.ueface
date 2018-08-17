@@ -1,6 +1,48 @@
 FROM centos:7
 
-ADD UEface /UEface
+#ARG python=3.6.6
 
-RUN /UEface
+
+#ENV HTTP_PROXY=http://10.17.41.7:6001
+#ENV HTTPS_PROXY=http://10.17.41.7:6001
+
+RUN mkdir /build
+WORKDIR /build
+
+RUN rm -f /etc/yum.repos.d/CentOS7-Base-163.repo && \
+    curl http://mirrors.163.com/.help/CentOS7-Base-163.repo > /etc/yum.repos.d/CentOS7-Base-163.repo && \
+    sed -i 's/\$releasever/7/g' /etc/yum.repos.d/CentOS7-Base-163.repo && \
+    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
+    yum install -y wget gcc make zlib-devel mysql && \
+    yum clean all
+
+COPY ./* /build/
+
+
+# 安装Python
+#RUN tar -zxvf Python-3.6.6.tgz && \
+#    cd Python-3.6.6 && \
+#    ./configure && \
+#    make -j 3 && \
+#    make install && \
+#    curl -k https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+#    python get-pip.py
+
+
+# RUN pip -i https://pypi.tuna.tsinghua.edu.cn/simple install tensorflow
+
+
+
+
+
+
+ENV HTTP_PROXY=""
+ENV HTTPS_PROXY=""
+
+
+
+
+
+
+
     
