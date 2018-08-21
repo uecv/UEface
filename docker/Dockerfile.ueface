@@ -3,33 +3,67 @@ FROM centos:7
 #ARG python=3.6.6
 
 
-#ENV HTTP_PROXY=http://10.17.41.7:6001
-#ENV HTTPS_PROXY=http://10.17.41.7:6001
+#ENV HTTP_PROXY=10.17.41.7:6001
+#ENV HTTPS_PROXY=10.17.41.7:6001
 
-RUN mkdir /build
+RUN mkdir /build && mkdir workspace
 WORKDIR /build
 
 RUN rm -f /etc/yum.repos.d/CentOS7-Base-163.repo && \
     curl http://mirrors.163.com/.help/CentOS7-Base-163.repo > /etc/yum.repos.d/CentOS7-Base-163.repo && \
     sed -i 's/\$releasever/7/g' /etc/yum.repos.d/CentOS7-Base-163.repo && \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    yum install -y wget gcc make zlib-devel mysql && \
+    yum install -y wget gcc gcc-c++ make zlib-devel mysql openssl openssl-devel \
+        libXext libSM libXrender  git autoconf automake cmake  freetype-devel gcc \
+        gcc-c++ git libtool make mercurial pkgconfig zlib-devel && \
     yum clean all
 
 COPY ./* /build/
 
 
 # 安装Python
-#RUN tar -zxvf Python-3.6.6.tgz && \
-#    cd Python-3.6.6 && \
-#    ./configure && \
-#    make -j 3 && \
-#    make install && \
-#    curl -k https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-#    python get-pip.py
+RUN tar -zxvf Python-3.6.6.tgz && \
+    cd Python-3.6.6 && \
+    ./configure --with-ssl && \
+    make -j 3 && \
+    make -j 3 install && \
+    curl -k https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python get-pip.py
 
 
-# RUN pip -i https://pypi.tuna.tsinghua.edu.cn/simple install tensorflow
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple tensorflow \
+   opencv-python \
+   redis \
+   Pillow \
+   tornado \
+   sqlalchemy \
+   pymysql
+
+
+# 安装nginx
+RUN curl http://nginx.org/download/nginx-1.15.2.tar.gz -o nginx-1.15.2.tar.gz && \
+  tar -zxvf nginx-1.15.2.tar.gz  && \
+  cd nginx-1.15.2 && \
+  ./configure && \
+  make -j 3 && \
+  make -j 3 install && \
+  echo "export PATH=/usr/local/nginx/sbin:$PATH" > /etc/profile
+
+
+# 安装redis
+RUN curl http://download.redis.io/releases/redis-4.0.11.tar.gz -o redis-4.0.11.tar.gz && \
+  tar -zxvf redis-4.0.11.tar.gz  && \
+  cd redis-4.0.11 && \
+  make -j 3 PREFIX=/workspace/redis install && \
+  cp redis.conf /workspace/redis/ && \
+  sed -i 's/daemonize no/daemonize yes/' /workspace/redis/redis.conf
+
+
+# 安装ffmpeg/ffserver
+RUN git clone https://github.com/markus-perl/ffmpeg-build-script.git && \
+    cd ffmpeg-build-script && \
+    sed -i 's/ffmpeg-4.0.1/ffmpeg-3.4.4/' ./build-ffmpeg && \
+    ./build-ffmpeg --build
 
 
 

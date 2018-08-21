@@ -8,8 +8,7 @@ from kafka import KafkaConsumer
 from PIL import Image
 import io
 import numpy as np
-consumer = KafkaConsumer('frame',
-                         bootstrap_servers=['192.168.0.245:9092'],api_version = (0, 10))
+consumer = KafkaConsumer('frame',bootstrap_servers=['192.168.0.245:9092'],api_version = (0, 10))
 for message in consumer:
     # print ("%s:%d:%d: key=%s value =%s" % (message.topic, message.partition,
     #                                       message.offset, message.key,message.value))
