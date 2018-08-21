@@ -1,9 +1,12 @@
 
 import  json
 from settings import *
+from src.service import  features as featuresDB
+
 class  faceNetLib:
     def __init__(self,conf):
-        self._path = faceLibPath
+        pass
+#         self._path = faceLibPath
 
 
 
