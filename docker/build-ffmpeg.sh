@@ -233,7 +233,8 @@ fi
 
 
 if build "lame"; then
-	download "http://kent.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz" "lame-3.100.tar.gz"
+	#download "http://kent.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz" "lame-3.100.tar.gz"
+	extract "lame-3.100.tar.gz"
 	cd $PACKAGES/lame-3.100 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static --enable-nasm
 	execute make -j $MJOBS
@@ -244,7 +245,8 @@ fi
 
 
 if build "libopus"; then
-	download "https://archive.mozilla.org/pub/opus/opus-1.2.1.tar.gz" "opus-1.2.1.tar.gz"
+	#download "https://archive.mozilla.org/pub/opus/opus-1.2.1.tar.gz" "opus-1.2.1.tar.gz"
+	extract "opus-1.2.1.tar.gz"
 	cd $PACKAGES/opus-1.2.1 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared
 	execute make -j $MJOBS
@@ -254,7 +256,8 @@ fi
 
 
 if build "libogg"; then
-	download "http://downloads.xiph.org/releases/ogg/libogg-1.3.3.tar.gz" "libogg-1.3.3.tar.gz"
+	#download "http://downloads.xiph.org/releases/ogg/libogg-1.3.3.tar.gz" "libogg-1.3.3.tar.gz"
+	extract "libogg-1.3.3.tar.gz"
 	cd $PACKAGES/libogg-1.3.3 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
 	execute make -j $MJOBS
