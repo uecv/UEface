@@ -71,6 +71,16 @@ download () {
 
 
 
+extract () {
+    if [ ! -f "$PACKAGES/$1" ]; then
+		if ! tar -xvf "$PACKAGES/$1" -C "$PACKAGES" 2>/dev/null >/dev/null; then
+			echo "Failed to extract $2";
+			exit 1
+		fi
+        echo "extract Done"
+	fi
+}
+
 
 
 execute () {
@@ -161,7 +171,8 @@ fi
 
 
 if build "yasm"; then
-	download "http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz" "yasm-1.3.0.tar.gz"
+	#download "http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz" "yasm-1.3.0.tar.gz"
+	extract "yasm-1.3.0.tar.gz"
 	cd $PACKAGES/yasm-1.3.0 || exit
 	execute ./configure --prefix=${WORKSPACE}
 	execute make -j $MJOBS
@@ -170,7 +181,8 @@ if build "yasm"; then
 fi
 
 if build "nasm"; then
-	download "http://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz" "nasm.tar.gz"
+	#download "http://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz" "nasm.tar.gz"
+	extract "nasm-2.13.03.tar.gz"
 	cd $PACKAGES/nasm-2.13.03 || exit
 	execute ./autogen.sh
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
@@ -181,11 +193,12 @@ fi
 
 
 if build "x264"; then
-    download "http://ftp.videolan.org/pub/x264/snapshots/x264-snapshot-20180531-2245.tar.bz2" "last_x264.tar.bz2"
+    #download "http://ftp.videolan.org/pub/x264/snapshots/x264-snapshot-20180531-2245.tar.bz2" "last_x264.tar.bz2"
 	#curl -L --silent -o "$PACKAGES/last_x264.tar.bz2" "http://ftp.videolan.org/pub/x264/snapshots/x264-snapshot-20180531-2245.tar.bz2"
 	#git clone --depth 1 http://git.videolan.org/git/x264 "$PACKAGES/last_x264"
 	#tar -xvf "$PACKAGES/last_x264.tar.bz2" -C "$PACKAGES" 2>/dev/null >/dev/null;
-	cd $PACKAGES/last_x264 || exit
+	extract "x264-snapshot-20180531-2245.tar.bz2"
+	cd $PACKAGES/x264-snapshot-20180531-2245 || exit
     execute ./configure --prefix=${WORKSPACE} --enable-static
     execute make -j $MJOBS
 	execute make install
@@ -195,8 +208,9 @@ fi
 
 
 if build "x265"; then
-	download "https://bitbucket.org/multicoreware/x265/downloads/x265_2.8.tar.gz" "x265-2.8.tar.gz"
-	cd $PACKAGES/x265_* || exit
+	#download "https://bitbucket.org/multicoreware/x265/downloads/x265_2.8.tar.gz" "x265-2.8.tar.gz"
+	extract "x265-2.8.tar.gz"
+	cd $PACKAGES/x265_2.8 || exit
 	cd source || exit
 	execute cmake -DCMAKE_INSTALL_PREFIX:PATH=${WORKSPACE} -DENABLE_SHARED:bool=off .
 	execute make -j $MJOBS
@@ -208,7 +222,8 @@ fi
 
 
 if build "fdk_aac"; then
-	download "http://downloads.sourceforge.net/project/opencore-amr/fdk-aac/fdk-aac-0.1.6.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fopencore-amr%2Ffiles%2Ffdk-aac%2F&ts=1457561564&use_mirror=kent" "fdk-aac-0.1.6.tar.gz"
+	#download "http://downloads.sourceforge.net/project/opencore-amr/fdk-aac/fdk-aac-0.1.6.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fopencore-amr%2Ffiles%2Ffdk-aac%2F&ts=1457561564&use_mirror=kent" "fdk-aac-0.1.6.tar.gz"
+	extract "fdk-aac-0.1.6.tar.gz"
 	cd $PACKAGES/fdk-aac-0.1.6 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
 	execute make -j $MJOBS
