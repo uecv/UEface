@@ -60,11 +60,7 @@ RUN curl http://download.redis.io/releases/redis-4.0.11.tar.gz -o redis-4.0.11.t
 
 
 # 安装ffmpeg/ffserver
-RUN git clone https://github.com/markus-perl/ffmpeg-build-script.git && \
-    cd ffmpeg-build-script && \
-    sed -i 's/ffmpeg-4.0.1/ffmpeg-3.4.4/' ./build-ffmpeg && \
-    ./build-ffmpeg --build
-
+RUN build-ffmpeg.sh --build
 
 
 

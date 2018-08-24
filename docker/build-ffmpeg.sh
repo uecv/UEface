@@ -4,8 +4,10 @@
 
 VERSION=1.0
 CWD=$(pwd)
-PACKAGES="$CWD/packages"
-WORKSPACE="$HOME/ffmpeg_workspace"
+# package中需要预先放好ffmpeg依赖的包
+PACKAGES="$CWD/ffmpeg_packages"
+TMP_PACKAGES="$CMD/tmp_ffmpeg_packages"
+WORKSPACE="$HOME/ffmpeg"
 CC=clang
 LDFLAGS="-L${WORKSPACE}/lib -lm"
 CFLAGS="-I${WORKSPACE}/include"
@@ -72,13 +74,11 @@ download () {
 
 
 extract () {
-    if [ ! -f "$PACKAGES/$1" ]; then
-		if ! tar -xvf "$PACKAGES/$1" -C "$PACKAGES" 2>/dev/null >/dev/null; then
+		if ! tar -xvf "$PACKAGES/$1" -C "$TMP_PACKAGES" 2>/dev/null >/dev/null; then
 			echo "Failed to extract $2";
 			exit 1
 		fi
         echo "extract Done"
-	fi
 }
 
 
@@ -101,8 +101,8 @@ build () {
 	echo "building $1"
 	echo "======================="
 
-	if [ -f "$PACKAGES/$1.done" ]; then
-		echo "$1 already built. Remove $PACKAGES/$1.done lockfile to rebuild it."
+	if [ -f "$TMP_PACKAGES/$1.done" ]; then
+		echo "$1 already built. Remove $TMP_PACKAGES/$1.done lockfile to rebuild it."
 		return 1
 	fi
 
@@ -119,7 +119,7 @@ command_exists() {
 
 
 build_done () {
-	touch "$PACKAGES/$1.done"
+	touch "$TMP_PACKAGES/$1.done"
 }
 
 echo "ffmpeg-build-script v$VERSION"
@@ -128,7 +128,7 @@ echo ""
 
 case "$1" in
 "--cleanup")
-	remove_dir $PACKAGES
+	remove_dir $TMP_PACKAGES
 	remove_dir $WORKSPACE
 	echo "Cleanup done."
 	echo ""
@@ -149,10 +149,21 @@ esac
 
 echo "Using $MJOBS make jobs simultaneously."
 
-make_dir $PACKAGES
+
+if [ -d "$PACKAGES" ]; then
+		echo "$PACKAGES don't exist!"
+		return 1
+fi
+
+
+# make_dir $PACKAGES
 make_dir $WORKSPACE
+make_dir $TMP_PACKAGES
 
 export PATH=${WORKSPACE}/bin:$PATH
+
+
+
 
 if ! command_exists "make"; then
     echo "make not installed.";
@@ -173,7 +184,7 @@ fi
 if build "yasm"; then
 	#download "http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz" "yasm-1.3.0.tar.gz"
 	extract "yasm-1.3.0.tar.gz"
-	cd $PACKAGES/yasm-1.3.0 || exit
+	cd $TMP_PACKAGES/yasm-1.3.0 || exit
 	execute ./configure --prefix=${WORKSPACE}
 	execute make -j $MJOBS
 	execute make install
@@ -183,7 +194,7 @@ fi
 if build "nasm"; then
 	#download "http://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz" "nasm.tar.gz"
 	extract "nasm-2.13.03.tar.gz"
-	cd $PACKAGES/nasm-2.13.03 || exit
+	cd $TMP_PACKAGES/nasm-2.13.03 || exit
 	execute ./autogen.sh
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
 	execute make -j $MJOBS
@@ -198,7 +209,7 @@ if build "x264"; then
 	#git clone --depth 1 http://git.videolan.org/git/x264 "$PACKAGES/last_x264"
 	#tar -xvf "$PACKAGES/last_x264.tar.bz2" -C "$PACKAGES" 2>/dev/null >/dev/null;
 	extract "x264-snapshot-20180531-2245.tar.bz2"
-	cd $PACKAGES/x264-snapshot-20180531-2245 || exit
+	cd $TMP_PACKAGES/x264-snapshot-20180531-2245 || exit
     execute ./configure --prefix=${WORKSPACE} --enable-static
     execute make -j $MJOBS
 	execute make install
@@ -210,7 +221,7 @@ fi
 if build "x265"; then
 	#download "https://bitbucket.org/multicoreware/x265/downloads/x265_2.8.tar.gz" "x265-2.8.tar.gz"
 	extract "x265-2.8.tar.gz"
-	cd $PACKAGES/x265_2.8 || exit
+	cd $TMP_PACKAGES/x265_2.8 || exit
 	cd source || exit
 	execute cmake -DCMAKE_INSTALL_PREFIX:PATH=${WORKSPACE} -DENABLE_SHARED:bool=off .
 	execute make -j $MJOBS
@@ -224,7 +235,7 @@ fi
 if build "fdk_aac"; then
 	#download "http://downloads.sourceforge.net/project/opencore-amr/fdk-aac/fdk-aac-0.1.6.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fopencore-amr%2Ffiles%2Ffdk-aac%2F&ts=1457561564&use_mirror=kent" "fdk-aac-0.1.6.tar.gz"
 	extract "fdk-aac-0.1.6.tar.gz"
-	cd $PACKAGES/fdk-aac-0.1.6 || exit
+	cd $TMP_PACKAGES/fdk-aac-0.1.6 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
 	execute make -j $MJOBS
 	execute make install
@@ -247,7 +258,7 @@ fi
 if build "libopus"; then
 	#download "https://archive.mozilla.org/pub/opus/opus-1.2.1.tar.gz" "opus-1.2.1.tar.gz"
 	extract "opus-1.2.1.tar.gz"
-	cd $PACKAGES/opus-1.2.1 || exit
+	cd $TMP_PACKAGES/opus-1.2.1 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared
 	execute make -j $MJOBS
 	execute make install
@@ -258,7 +269,7 @@ fi
 if build "libogg"; then
 	#download "http://downloads.xiph.org/releases/ogg/libogg-1.3.3.tar.gz" "libogg-1.3.3.tar.gz"
 	extract "libogg-1.3.3.tar.gz"
-	cd $PACKAGES/libogg-1.3.3 || exit
+	cd $TMP_PACKAGES/libogg-1.3.3 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
 	execute make -j $MJOBS
 	execute make install
@@ -267,7 +278,8 @@ fi
 
 
 if build "libvorbis"; then
-	download "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.gz" "libvorbis-1.3.6.tar.gz"
+	#download "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.gz" "libvorbis-1.3.6.tar.gz"
+	extract "libvorbis-1.3.6.tar.gz"
 	cd $PACKAGES/libvorbis-1.3.6 || exit
 	execute ./configure --prefix=${WORKSPACE} --enable-static --disable-shared
 	execute make -j $MJOBS
@@ -276,10 +288,10 @@ if build "libvorbis"; then
 fi
 
 if build "libvpx"; then
-    mkdir $PACKAGES/libvpx
-    git clone --depth 1 https://github.com/webmproject/libvpx.git $PACKAGES/libvpx
-    cd $PACKAGES/libvpx || exit
-
+    #mkdir $PACKAGES/libvpx
+    #git clone --depth 1 https://github.com/webmproject/libvpx.git $PACKAGES/libvpx
+    extract "libvpx-1.7.0.tar.gz"
+    cd $TMP_PACKAGES/libvpx-1.7.0 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
 	execute make -j $MJOBS
 	execute make install
@@ -288,16 +300,18 @@ fi
 
 
 build "ffmpeg"
-download "http://ffmpeg.org/releases/ffmpeg-3.4.4.tar.bz2" "ffmpeg-snapshot.tar.bz2"
-cd $PACKAGES/ffmpeg-3.4.4 || exit
-PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$WORKSPACE/lib/pkgconfig" ./configure \
+
+#download "http://ffmpeg.org/releases/ffmpeg-3.4.4.tar.bz2" "ffmpeg-snapshot.tar.bz2"
+extract "ffmpeg-3.4.4.tar.bz2"
+cd $TMP_PACKAGES/ffmpeg-3.4.4 || exit
+PKG_CONFIG_PATH="$WORKSPACE/lib/pkgconfig" ./configure \
   --prefix="$HOME/ffmpeg_build" \
   --pkg-config-flags="--static" \
   --extra-cflags="-I$WORKSPACE/include" \
   --extra-ldflags="-L$WORKSPACE/lib" \
   --extra-libs=-lpthread \
   --extra-libs=-lm \
-  --bindir="$HOME/bin" \
+  --bindir="$WORKSPACE/bin" \
   --enable-gpl \
   --enable-libfdk_aac \
   --enable-libfreetype \
