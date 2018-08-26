@@ -4,31 +4,32 @@
    @author: kenwood
    @time: 18-5-29 上午9:34
 """
-import tornado.ioloop
-from tornado.ioloop import IOLoop
-import tornado.web
-import tornado.httpserver
-import tornado.websocket
-from PIL import Image
-from io import BytesIO
-from src.service import people
 import base64
 import time
-from src.utils import Constant
+from io import BytesIO
+
+import tornado.httpserver
+import tornado.ioloop
+import tornado.web
+import tornado.websocket
+from PIL import Image
+from tornado.ioloop import IOLoop
+
+from settings import *
+from src.service import people
 from src.utils.redis_queue import RedisQueue
-import json
-from src.Config import Config
-import os
+
+"""
 conf = Config.Config(Constant.CONFIG_PATH)
 redis_host = conf.get('web', 'redis_host')
 redis_port = conf.get('web', 'redis_port')
 redis_queue = conf.get('web', 'redis_queue')
 image_root = conf.get('web', 'image_root')
 map_path = conf.get('web', 'map_path')
-
+"""
 queue = RedisQueue(
-    host='192.168.0.245',
-    port=6379)
+    host=redis_host,
+    port=redis_port)
 count = 0
 class SocketHandler(tornado.websocket.WebSocketHandler):
     def simple_init(self):
@@ -99,16 +100,17 @@ class CamHandler(tornado.web.RequestHandler):
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
 
-        img = Image.open('/home/kenwood/cat.jpeg', 'r')
-        buffered = BytesIO()
-        img.save(buffered, format="JPEG")
-        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        #img = Image.open('/home/kenwood/cat.jpeg', 'r')
+        #buffered = BytesIO()
+        #img.save(buffered, format="JPEG")
+        #img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        img_str=""
         cam_dict = {
             "map": img_str,
             "camera": [{
                 "name": "摄像头A",
                 "id": 1,
-                "url": "http://192.168.0.245/livestream.flv",
+                "url": "http://nginx/livestream.flv",
                 # "url":"http://live.useease.cn/live/livestream.flv?auth_key=1528096827-0-0-7a54cf956bee59637d10309a96b2969a",
                 "x": 30,
                 "y": 50
@@ -116,7 +118,7 @@ class CamHandler(tornado.web.RequestHandler):
                 {
                     "name": "摄像头B",
                     "id": 2,
-                    "url": "http://192.168.0.245/livestream.flv",
+                    "url": "http://nginx/livestream.flv",
                     # "url": "http://live.useease.cn/live/livestream.flv?auth_key=1528096827-0-0-7a54cf956bee59637d10309a96b2969a",
                     "x": 70,
                     "y": 80,

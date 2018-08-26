@@ -1,0 +1,92 @@
+FROM centos:6.9
+
+#ARG python=3.6.6
+#ENV HTTP_PROXY=10.17.41.7:6001
+#ENV HTTPS_PROXY=10.17.41.7:6001
+#ENV HTTP_PROXY=""
+#ENV HTTPS_PROXY=""
+ENV WORKSPACE=/build/lib
+
+
+## 创建工作目录
+RUN mkdir /build
+WORKDIR /build
+
+
+## 使用163的rpm仓库,并安装后续python,tensorflow,mysql,ffserver等依赖的包
+RUN rm -f /etc/yum.repos.d/CentOS6-Base-163.repo && \
+    curl http://mirrors.163.com/.help/CentOS6-Base-163.repo > /etc/yum.repos.d/CentOS6-Base-163.repo && \
+    sed -i 's/\$releasever/6/g' /etc/yum.repos.d/CentOS6-Base-163.repo && \
+    curl http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm > /tmp/mysql-community-release-el6-5.noarch.rpm && \
+    rpm -ivh /tmp/mysql-community-release-el6-5.noarch.rpm && \
+    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6 && \
+    yum install -y wget gcc gcc-c++ make zlib-devel mysql openssl openssl-devel \
+        libXext libSM libXrender  git autoconf automake cmake  freetype-devel gcc \
+        gcc-c++ git libtool make mercurial pkgconfig zlib-devel bzip2 pcre-devel mysql-community-server && \
+    yum clean all
+
+
+# 安装nginx
+RUN wget -O nginx-1.15.2.tar.gz http://nginx.org/download/nginx-1.15.2.tar.gz && \
+  tar -zxvf nginx-1.15.2.tar.gz  && \
+  cd nginx-1.15.2 && \
+  ./configure --prefix=$WORKSPACE/nginx && \
+  make -j 3 && \
+  make -j 3 install && \
+  echo "export PATH=$WORKSPACE/nginx/sbin:$PATH" > /etc/profile
+
+
+# 安装redis
+RUN wget -O redis-4.0.11.tar.gz http://download.redis.io/releases/redis-4.0.11.tar.gz && \
+  tar -zxvf redis-4.0.11.tar.gz  && \
+  cd redis-4.0.11 && \
+  make -j 3 PREFIX=$WORKSPACE/redis install && \
+  cp redis.conf $WORKSPACE/redis/ && \
+  sed -i 's/daemonize no/daemonize yes/' $WORKSPACE/redis/redis.conf
+
+
+COPY ./Python-3.6.6.tgz /build/
+
+# 安装Python
+RUN tar -zxvf Python-3.6.6.tgz && \
+    cd Python-3.6.6 && \
+    ./configure --with-ssl && \
+    make -j 3 && \
+    make -j 3 install
+
+# 安装pip
+Run wget --no-check-certificate -O get-pip.py https://bootstrap.pypa.io/get-pip.py  && \
+    python3 get-pip.py
+
+# 下载python包
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple tensorflow \
+   opencv-python \
+   redis \
+   Pillow \
+   tornado \
+   sqlalchemy \
+   pymysql
+
+
+## 复制离线准备好的包到docker中
+COPY ./ffmpeg_packages /build/ffmpeg_packages
+COPY ./build-ffmpeg.sh /build/build-ffmpeg.sh
+
+# 安装ffmpeg/ffserver
+RUN sh ./build-ffmpeg.sh --build
+
+
+## 启动脚本
+CMD ["start.sh"]
+
+
+
+
+
+
+
+
+
+
+
+    

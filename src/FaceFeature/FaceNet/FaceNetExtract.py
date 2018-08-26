@@ -10,16 +10,16 @@ faceNet 模型 人脸特征抽取类
 from src.FaceFeature.FaceNet.align_custom import AlignCustom
 from src.FaceFeature.FaceNet.faceNet_feature import FaceFeature
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
-import  cv2
 from src.FaceFeature.BaseFaceFeature import BaseFaceFeature
+
 
 class FaceNetExtract(BaseFaceFeature):
 
-    def __init__(self,conf):
+    def __init__(self,faceNetModel):
         FRGraph = FaceRecGraph()
         self._model = FaceFeature(
             FRGraph,
-            model_path=conf.get("path","faceNetModel"))
+            model_path=faceNetModel)
         self._aligner = AlignCustom()
 
 

@@ -1,19 +1,15 @@
 
 import  json
-
-from src.service import  features as featuresDB
-
+from settings import *
 class  faceNetLib:
     def __init__(self,conf):
-        self._path = conf.get("path","faceLibPath")
+        self._path = faceLibPath
 
 
 
     def getlib(self):
-        known_face_dataset = featuresDB.getFeature()
-
-        # f = open(self._path, 'r')
-        # known_face_dataset = json.loads(f.read())  # 人脸特征库
-        # f.close()
+        f = open(self._path, 'r')
+        known_face_dataset = json.loads(f.read())  # 人脸特征库
+        f.close()
 
         return known_face_dataset

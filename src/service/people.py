@@ -45,8 +45,8 @@ def insert_people(people):
 
 def getfilterPeople(people):
 
-    result = session.query(People).filter(People.worker_id==people.worker_id)\
-        .filter(People.company_id==people.company_id)\
+    result = session.query(People).filter(People.worker_id==people.worker_id) \
+        .filter(People.company_id==people.company_id) \
         .filter(People.name ==people.name).all()
 
     return result

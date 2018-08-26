@@ -1,0 +1,4 @@
+2018-08-02 19:39:51,545 - UEface - INFO - mysql+pymysql://root:123456@face_mysql:3306/ueface?charset=utf8
+2018-08-02 19:40:16,298 - UEface - DEBUG - this is a test
+2018-08-02 19:40:16,298 - UEface - DEBUG - this is a test
+123
