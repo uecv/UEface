@@ -1,4 +1,5 @@
-FROM centos:6.9
+FROM centos:7
+#FROM ubuntu:18.04
 
 #ARG python=3.6.6
 #ENV HTTP_PROXY=10.17.41.7:6001
@@ -14,15 +15,17 @@ WORKDIR /build
 
 
 ## 使用163的rpm仓库,并安装后续python,tensorflow,mysql,ffserver等依赖的包
-RUN rm -f /etc/yum.repos.d/CentOS6-Base-163.repo && \
-    curl http://mirrors.163.com/.help/CentOS6-Base-163.repo > /etc/yum.repos.d/CentOS6-Base-163.repo && \
-    sed -i 's/\$releasever/6/g' /etc/yum.repos.d/CentOS6-Base-163.repo && \
-    curl http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm > /tmp/mysql-community-release-el6-5.noarch.rpm && \
-    rpm -ivh /tmp/mysql-community-release-el6-5.noarch.rpm && \
-    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6 && \
+RUN rm -f /etc/yum.repos.d/CentOS7-Base-163.repo && \
+    curl http://mirrors.163.com/.help/CentOS7-Base-163.repo > /etc/yum.repos.d/CentOS7-Base-163.repo && \
+    sed -i 's/\$releasever/7/g' /etc/yum.repos.d/CentOS7-Base-163.repo && \
+    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
+    #curl https://dev.mysql.com/get/mysql57-community-release-el7-9.noarch.rpm > /tmp/mysql57-community-release-el7-9.noarch.rpm && \
+    #rpm -ivh mysql57-community-release-el7-9.noarch.rpm && \
+    rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm && \
+    yum repolist enabled | grep "mysql.*-community.*" && \
     yum install -y wget gcc gcc-c++ make zlib-devel mysql openssl openssl-devel \
         libXext libSM libXrender  git autoconf automake cmake  freetype-devel gcc \
-        gcc-c++ git libtool make mercurial pkgconfig zlib-devel bzip2 pcre-devel mysql-community-server && \
+        gcc-c++ git libtool make mercurial pkgconfig zlib-devel bzip2 pcre-devel mysql-server && \
     yum clean all
 
 
@@ -33,7 +36,8 @@ RUN wget -O nginx-1.15.2.tar.gz http://nginx.org/download/nginx-1.15.2.tar.gz &&
   ./configure --prefix=$WORKSPACE/nginx && \
   make -j 3 && \
   make -j 3 install && \
-  echo "export PATH=$WORKSPACE/nginx/sbin:$PATH" > /etc/profile
+  echo "export PATH=$WORKSPACE/nginx/sbin:$PATH" > /etc/profile && \
+  source /etc/profile
 
 
 # 安装redis
@@ -42,12 +46,23 @@ RUN wget -O redis-4.0.11.tar.gz http://download.redis.io/releases/redis-4.0.11.t
   cd redis-4.0.11 && \
   make -j 3 PREFIX=$WORKSPACE/redis install && \
   cp redis.conf $WORKSPACE/redis/ && \
-  sed -i 's/daemonize no/daemonize yes/' $WORKSPACE/redis/redis.conf
+  sed -i 's/daemonize no/daemonize yes/' $WORKSPACE/redis/redis.conf && \
+  echo "export PATH=$WORKSPACE/redis/bin:$PATH" > /etc/profile && \
+  source /etc/profile
 
 
-COPY ./Python-3.6.6.tgz /build/
+## 复制离线准备好的包到docker中
+COPY ./ffmpeg_packages /build/ffmpeg_packages
+COPY ./build-ffmpeg.sh /build/build-ffmpeg.sh
+
+## 安装ffmpeg/ffserver
+RUN sh ./build-ffmpeg.sh --build
+
 
 # 安装Python
+COPY ./Python-3.6.6.tgz /build/
+
+
 RUN tar -zxvf Python-3.6.6.tgz && \
     cd Python-3.6.6 && \
     ./configure --with-ssl && \
@@ -65,19 +80,21 @@ RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple tensorflow \
    Pillow \
    tornado \
    sqlalchemy \
-   pymysql
+   pymysql \
+   pandas
+
+#RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple numpy
 
 
-## 复制离线准备好的包到docker中
-COPY ./ffmpeg_packages /build/ffmpeg_packages
-COPY ./build-ffmpeg.sh /build/build-ffmpeg.sh
+## ueface程序
+COPY ./UEface /build/UEface/
 
-# 安装ffmpeg/ffserver
-RUN sh ./build-ffmpeg.sh --build
+RUN sh /build/UEface/docker/start.sh
 
 
-## 启动脚本
-CMD ["start.sh"]
+## 入口
+ENTRYPOINT ["/bin/bash"]
+
 
 
 
