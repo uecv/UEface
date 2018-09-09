@@ -1,5 +1,7 @@
+
+
 ## 启动mysql
-service mysqld start
+mysqld --initialize --user=mysql --basedir=/data/mysql/installdir --datadir=/data/mysql/datadir/3306/data
 
 ## 初始化数据库
 python3 /build/UEface/ueface.py initdb
@@ -17,4 +19,6 @@ python3 /build/UEface/ueface.py web
 
 
 ## 启动web
-nginx -c /build/UEface/nginx.conf
+cp -f  /build/UEface/docker/nginx.conf /build/lib/nginx/conf/nginx.conf
+/build/lib/nginx/sbin/nginx -c /build/lib/nginx/conf/nginx.conf
+
