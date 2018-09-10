@@ -175,9 +175,9 @@ class faceNetRecognition(BaseRecognition):
 
             id,simi_max,_ = simi_sort[0]
 
-            result = id
+            result = (id,simi_max)
             if simi_max < percent_thres:
-                result = 'Unknown'
+                result = ('Unknown',0)
             returnRes.append(result)
 
 

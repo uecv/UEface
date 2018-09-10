@@ -48,6 +48,7 @@ def addFrame2Cach(face_id, face_image, dist_id_num):
 
     for id_simi, img in zip(face_id, face_image):
 
+        print(id_simi)
         id,simi = id_simi
 
         if id not in dist_id_num:
@@ -214,7 +215,7 @@ def process():
                     result_dict['similarity'] = int(simi)  # list
                     LOG.debug(result_dict['user_id'])
                     redis_connect.put(redis_queue,result_dict)
-
+                    print(id)
                 dist_name_num = {}  #清空缓存
 
                 countFrame = 0 #重新开始计数

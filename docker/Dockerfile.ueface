@@ -94,7 +94,14 @@ COPY ./app /build/app
 
 #RUN sh /build/UEface/docker/start.sh
 
-#ENV LANG C.UTF-8
+## 设置环境编码
+RUN  yum -y install kde-l10n-Chinese telnet && \
+	     yum -y reinstall glibc-common &&\
+              yum clean all  && \
+                localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
+
+
+ENV LC_ALL "zh_CN.UTF-8"
 
 
 

@@ -62,6 +62,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         print("Just checking")
         global  count
         #recognition result
+
+        if queue.qsize('rq') == 0:
+            print("rq size 0")
+            return
+
         data = queue.get_nowait(redis_queue).decode('utf-8')
         count +=1
         # people_num
@@ -72,6 +77,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         # print(eval(data)['user_id'])
 
         result = eval(data)
+        print(eval(data))
         name,image_path = people.get_people(eval(data)['user_id'])
 
         #人脸库照片
@@ -128,11 +134,10 @@ class CamHandler(tornado.web.RequestHandler):
 def make_app():
     return tornado.web.Application([
         (r"/get_camera", CamHandler),
-        (r'/ws', SocketHandler),
+        (r'/live', SocketHandler),
     ])
 
 def main():
-
     app = make_app()
     server = tornado.httpserver.HTTPServer(app)
     server.bind(5000)

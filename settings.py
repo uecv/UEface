@@ -9,7 +9,7 @@ import os
 import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #[source]
-source_path = "/build/wy.mp4"
+source_path = "/build/testVideo.mp4"
 
 faceLibPath = os.path.join(BASE_DIR,"src/library/faceNetLib/facerec_128D.txt")
 mtcnnDeteModel = os.path.join(BASE_DIR,"src/Model/faceNet/models/")
