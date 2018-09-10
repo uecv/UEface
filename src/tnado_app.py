@@ -59,12 +59,12 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         return True
 
     def check_ten_seconds(self):
-        print("Just checking")
+        #print("Just checking")
         global  count
         #recognition result
 
         if queue.qsize('rq') == 0:
-            print("rq size 0")
+            #print("rq size 0")
             return
 
         data = queue.get_nowait(redis_queue).decode('utf-8')
@@ -81,8 +81,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         info = people.get_people(result['user_id'])
 
         #人脸库照片
-        print(os.path.join(image_root,info.image_path))
-        img = Image.open(os.path.join(image_root,info.image_path), 'r')
+
+        company_path = os.path.join(image_root,info.company_id)
+        print(os.path.join(company_path,info.image_path))
+        img = Image.open(os.path.join(image_path,info.image_path), 'r')
+
         buffered = BytesIO()
         img.save(buffered, format="JPEG")
         raw_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
@@ -93,7 +96,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                        'image': result['head_image'],
                        'id':   result['id'],
                        'raw_image': raw_image,
-                       'similarity': result['similarity'],
+                       'similarity': int(result['similarity']),
                        'type': "GET_RECO_RESULT"})
         if (time.time() - self.last > 1):
             self.write_message(msg)

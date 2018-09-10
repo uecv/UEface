@@ -31,7 +31,7 @@ mysql_password="123456"
 mysql_dbname="ueface"
 
 #[web]
-image_root=os.path.join(BASE_DIR,"src/library/images/useease")
+image_root=os.path.join(BASE_DIR,"src/library/images")
 redis_queue="rq"
 map_path =os.path.join(BASE_DIR,"src/library/map")
 

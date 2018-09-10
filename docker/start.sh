@@ -22,7 +22,7 @@ redis-server /build/lib/redis/redis.conf
 
 
 ## 启动web后台
-python3 /build/UEface/ueface.py web &
+nohup python3 /build/UEface/ueface.py web > web.nohup &
 
 
 
@@ -35,16 +35,13 @@ cp -f /build/UEface/docker/nginx.conf /build/lib/nginx/conf/ && \
 
 ## 处理结果
 nohup python3 /build/UEface/ueface.py main $source_url > main.nohup &
-
+nohup python3 /build/UEface/ueface.py main > main.nohup &
 
 # docker cp wy.mp4 face2:/build/wy.mp4
 
 #docker run -it --name face2 -p 80:80 -p 5000:5000 -v /root/ueface/UEface:/build/UEface face:v1.1
 # ffmpeg -i /build/testVideo.mp4 "http://localhost:8888/feed1.ffm"
-nohup \
-ffmpeg  -r 25  -rtsp_transport tcp -i\
- "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0" \
- "http://localhost:8888/feed1.ffm" > ffmpeg.nohup &
+nohup ffmpeg  -r 25  -rtsp_transport tcp -i $source_url "http://localhost:8888/feed1.ffm" > ffmpeg.nohup &
 
 
 # docker cp UEface/docker/nginx.conf face2:/build/UEface/docker/nginx.conf

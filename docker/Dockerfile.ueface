@@ -98,9 +98,9 @@ COPY ./app /build/app
 
 
 ## 设置环境编码
-RUN  yum -y install kde-l10n-Chinese telnet && \
-	 yum -y reinstall glibc-common &&\
-     yum clean all  && \
+#RUN  yum -y install kde-l10n-Chinese telnet && \
+#	 yum -y reinstall glibc-common &&\
+#     yum clean all  && \
 
 
 ENV LC_ALL "zh_CN.UTF-8"
@@ -108,8 +108,8 @@ ENV LC_ALL "zh_CN.UTF-8"
 #RUN sh /build/UEface/docker/start.sh
 
 ## 入口
-#ENTRYPOINT ["/build/UEface/docker/start.sh"]
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/build/UEface/docker/start.sh"]
+#ENTRYPOINT ["/bin/bash"]
 
 
 
