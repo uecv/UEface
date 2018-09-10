@@ -5,7 +5,9 @@ import  time
 import cv2
 import numpy as np
 from src.FaceRecognition.BaseRecognition import BaseRecognition
-
+from multiprocessing.dummy import Pool
+# from multiprocessing import Pool
+import  math
 '''
 faceNet实现人脸识别的类：包括调用人脸特征检测，人脸特征抽取等
 '''
@@ -17,26 +19,18 @@ class faceNetRecognition(BaseRecognition):
         '''
         初始化人脸检测接口   人脸特征抽取接口
         '''
-        pass
+
+        self.pool  = Pool(8)
+
 
     def _cos(self,vector1, vector2):
-        dot_product = 0.0
-        normA = 0.0
-        normB = 0.0
-        for a, b in zip(vector1, vector2):
-            dot_product += a * b
-            normA += a ** 2
-            normB += b ** 2
-        if normA == 0.0 or normB == 0.0:
-            return None
-        else:
-            return dot_product / ((normA * normB) ** 0.5)
+        npvec1, npvec2 = np.array(vector1), np.array(vector2)
+        return npvec1.dot(npvec2) / (math.sqrt((npvec1 ** 2).sum()) * math.sqrt((npvec2 ** 2).sum()))
+
 
     def Recognit(self, known_face_dataset, face_encodings, positions):
         '''
-
         :param known_face_dataset:  人脸特征库
-
         :param face_encodings:  人脸特征，list对象，包含多个人脸特征
         :param positions:  人脸姿态：  正脸  左脸  右脸
         :return: 在人脸特征库中，匹配到的人脸ID
@@ -50,7 +44,7 @@ class faceNetRecognition(BaseRecognition):
 
 
 
-        return face_ID[0]
+        return face_ID
 
 
     # def face_locations_encoding(self, image):
@@ -85,28 +79,23 @@ class faceNetRecognition(BaseRecognition):
 
     def mapFunction(self,name):
 
-        t1 = time.time()
+
         if name=="UEPEOPLE":
             return name,0,0.0
 
-        # '61ce9a22-6e0d-11e8-a284-3ca06736b3e1'
-        lib_person = self.data_set[name]['Center']
 
-        if len(lib_person)<1:
-            return name,0,0.0
-        lib_person = lib_person[0]
+        lib_person = self.data_set[name]
+
+
+
         person = self.data_set['UEPEOPLE']
-
+        t1 = time.time()
         simi = self._cos(lib_person, person)  # 相似度，越大越相似
 
         t2 = time.time()
 
 
         return  name,simi,t2-t1
-
-
-
-
 
     '''
     facerec_128D.txt Data Structure:
@@ -135,41 +124,33 @@ class faceNetRecognition(BaseRecognition):
         istance threshold
         :return: person name and percentage
         '''
-        if data_set is None:
-            f = open('./facerec_128D.txt', 'r')
-            data_set = json.loads(f.read())
+
         returnRes = []
         ######################################################
 
         '''使用map函数优化循环性能测试'''
-        from multiprocessing import Pool
-        from multiprocessing.dummy import Pool as ThreadPool
-
-        pool = ThreadPool(5)
         for people in features_arr:
             IDs_lib = list(self.data_set.keys())
             self.data_set['UEPEOPLE'] = people
 
             # 相似度列表，用户与人脸库中5000多个的相似度
-            import time
-            t1 = time.time()
-            simi_result = pool.map(self.mapFunction,IDs_lib)
-            t2 = time.time()
-            print("map操作时间：{t}".format(t = (t2 - t1)))
+            # import time
+            # t1 = time.time()
+            simi_result =  self.pool.map(self.mapFunction,IDs_lib)
+            # t2 = time.time()
+            # print("map操作时间：{t}".format(t = (t2 - t1)))
 
             simi_sort = sorted(simi_result,key= lambda x:x[1],reverse=True)
-            t3 = time.time()
-            print("排序操作时间：{t}".format(t=(t3 - t2)))
+            # t3 = time.time()
+            # print("排序操作时间：{t}".format(t=(t3 - t2)))
 
-            from functools import  reduce
-
-            # def add(x,y):
-            #     resule = x[2] + y[2]
-            #     return resule
+            # sumT = 0
+            # for temp in simi_result:
+            #     sumT = sumT + temp[2]
             #
-            # ss = reduce(add,simi_sort)
+            # maven = sumT / len(simi_result)
 
-
+            # print("map操作的平均时间为：{t},一共有{cn}个数据，一共花费的时间{sumt}".format(t = maven,cn = len(simi_result),sumt = sumT))
 
 
 
@@ -205,4 +186,4 @@ class faceNetRecognition(BaseRecognition):
         #     returnRes.append((result, smallest))
 
 
-        return returnRes,
+        return returnRes

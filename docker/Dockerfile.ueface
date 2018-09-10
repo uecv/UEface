@@ -26,6 +26,9 @@ RUN rm -f /etc/yum.repos.d/CentOS7-Base-163.repo && \
     yum install -y wget gcc gcc-c++ make zlib-devel mysql openssl openssl-devel \
         libXext libSM libXrender  git autoconf automake cmake  freetype-devel gcc \
         gcc-c++ git libtool make mercurial pkgconfig zlib-devel bzip2 pcre-devel mysql-server && \
+    yum -y install kde-l10n-Chinese telnet && \
+    yum -y reinstall glibc-common && \
+    localedef -c -f UTF-8 -i zh_CN zh_CN.utf8 && \
     yum clean all
 
 
@@ -92,22 +95,21 @@ COPY ./UEface /build/UEface/
 ## 前端
 COPY ./app /build/app
 
-#RUN sh /build/UEface/docker/start.sh
+
 
 ## 设置环境编码
 RUN  yum -y install kde-l10n-Chinese telnet && \
-	     yum -y reinstall glibc-common &&\
-              yum clean all  && \
-                localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
+	 yum -y reinstall glibc-common &&\
+     yum clean all  && \
 
 
 ENV LC_ALL "zh_CN.UTF-8"
 
-
+#RUN sh /build/UEface/docker/start.sh
 
 ## 入口
+#ENTRYPOINT ["/build/UEface/docker/start.sh"]
 ENTRYPOINT ["/bin/bash"]
-
 
 
 

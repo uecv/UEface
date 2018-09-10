@@ -48,7 +48,7 @@ def addFrame2Cach(face_id, face_image, dist_id_num):
 
     for id_simi, img in zip(face_id, face_image):
 
-        print(id_simi)
+        #print(id_simi)
         id,simi = id_simi
 
         if id not in dist_id_num:
@@ -85,9 +85,10 @@ def filterByCach(dist_name_num):
 
     return web_faceid,web_faceimg
 
-def process():
+def process(source=source_path):
+    # source_path是默认参数,从配置文件中获取
     #src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
-    LOG.info(source_path)
+    LOG.info(source)
     video_capture = cv2.VideoCapture(source_path)
     # video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 
@@ -199,7 +200,7 @@ def process():
                         continue
                     # if redis_connect.exists_key(id):
                     #     continue
-
+                    print(id)
                     head_img = Image.fromarray(head_image, 'RGB')
                     buffered = BytesIO()
                     head_img.save(buffered, format="JPEG")

@@ -77,18 +77,19 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         # print(eval(data)['user_id'])
 
         result = eval(data)
-        print(eval(data))
-        name,image_path = people.get_people(eval(data)['user_id'])
+        print(result)
+        info = people.get_people(result['user_id'])
 
         #人脸库照片
-        img = Image.open(os.path.join(image_root,image_path), 'r')
+        print(os.path.join(image_root,info.image_path))
+        img = Image.open(os.path.join(image_root,info.image_path), 'r')
         buffered = BytesIO()
         img.save(buffered, format="JPEG")
         raw_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
         result_dict = dict({'ts': result['ts'],
                        #Todo 读数据库
-                       'name': name,
+                       'name': info.name,
                        'image': result['head_image'],
                        'id':   result['id'],
                        'raw_image': raw_image,

@@ -17,7 +17,8 @@ def main():
         sys.exit()
     if cmd == 'main':
         from src import procesor
-        procesor.process()
+        source = sys.argv[2]
+        procesor.process(source)
     elif cmd == 'web':
         from src import tnado_app as web
         web.main()

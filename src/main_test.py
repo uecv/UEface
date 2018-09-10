@@ -114,7 +114,6 @@ def filterByCach(dist_name_num):
     return web_faceid,web_faceimg
 
 
-
 while True:
 
     # 获取一帧视频

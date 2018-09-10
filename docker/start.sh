@@ -1,12 +1,13 @@
+/bin/bash
 
+
+source_url = $1
 
 ## 启动mysql
-mysql_install_db --user=root
-mysqld --user=root &
+mysql_install_db --user=root &&  mysqld --user=root &
 
 ## 初始化数据库
-mysql -u root < /build/UEface/docker/initdb.sql
-python3 /build/UEface/ueface.py initdb
+mysql -u root < /build/UEface/docker/initdb.sql && python3 /build/UEface/ueface.py initdb
 
 
 ## 初始化图像库
@@ -26,14 +27,14 @@ python3 /build/UEface/ueface.py web &
 
 
 ## 启动web
-rm -f /build/lib/nginx/conf/nginx.conf
-cp -f /build/UEface/docker/nginx.conf /build/lib/nginx/conf/
+rm -f /build/lib/nginx/conf/nginx.conf && \
+cp -f /build/UEface/docker/nginx.conf /build/lib/nginx/conf/ && \
 /build/lib/nginx/sbin/nginx -c /build/lib/nginx/conf/nginx.conf
 
 
 
 ## 处理结果
-python3 /build/UEface/ueface.py main
+nohup python3 /build/UEface/ueface.py main $source_url > main.nohup &
 
 
 # docker cp wy.mp4 face2:/build/wy.mp4
@@ -43,9 +44,7 @@ python3 /build/UEface/ueface.py main
 nohup \
 ffmpeg  -r 25  -rtsp_transport tcp -i\
  "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0" \
- "http://localhost:8888/feed1.ffm" &
-
-export LC_ALL=zh_CN.UTF-8
+ "http://localhost:8888/feed1.ffm" > ffmpeg.nohup &
 
 
 # docker cp UEface/docker/nginx.conf face2:/build/UEface/docker/nginx.conf

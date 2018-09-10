@@ -89,7 +89,7 @@ class buildLib:
 
                 dbasePeople = perpleDB.getfilterPeople(people)
 
-                if len(dbasePeople) > 0:  # 如果数据中，已经存在该用户的特征，则不需要再次进行特征抽取。（公司id，用户工号，名称）相等
+                if len(dbasePeople)>0: #如果数据中，已经存在该用户的特征，则不需要再次进行特征抽取。（公司id，用户工号，名称）相等
                     continue
 
                 perpleDB.insert_people(people)
