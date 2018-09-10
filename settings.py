@@ -9,7 +9,7 @@ import os
 import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #[source]
-source_path = "/UEface/test.mp4"
+source_path = "/build/wy.mp4"
 
 faceLibPath = os.path.join(BASE_DIR,"src/library/faceNetLib/facerec_128D.txt")
 mtcnnDeteModel = os.path.join(BASE_DIR,"src/Model/faceNet/models/")
@@ -20,11 +20,11 @@ feature_file=os.path.join(BASE_DIR,"src/library/faceNetLib/facerec_128D.txt")
 
 #[cache]
 image_path=os.path.join(BASE_DIR,"src/library/images")
-redis_host="face_redis"
+redis_host="localhost"
 redis_port=6379
 
 #[mysql]
-mysql_host="face_mysql"
+mysql_host="localhost"
 mysql_port=3306
 mysql_user="root"
 mysql_password="123456"

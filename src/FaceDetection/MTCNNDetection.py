@@ -8,11 +8,11 @@
 from src.FaceDetection.mtcnn_detect import MTCNNDetect
 from src.FaceRecognition.faceNet.tf_graph import FaceRecGraph
 from src.FaceDetection.BaseDetection import BaseDetection
-
+from settings import *
 
 class MTCNNDetection(BaseDetection):
 
-    def __init__(self,mtcnnDeteModel):
+    def __init__(self,):
 
         self.path =mtcnnDeteModel
 

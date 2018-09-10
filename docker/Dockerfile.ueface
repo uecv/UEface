@@ -36,7 +36,7 @@ RUN wget -O nginx-1.15.2.tar.gz http://nginx.org/download/nginx-1.15.2.tar.gz &&
   ./configure --prefix=$WORKSPACE/nginx && \
   make -j 3 && \
   make -j 3 install && \
-  echo "export PATH=$WORKSPACE/nginx/sbin:$PATH" > /root/.bashrc && \
+  echo "export PATH=$WORKSPACE/nginx/sbin:$PATH" >> /root/.bashrc && \
   source /etc/profile
 
 
@@ -47,7 +47,7 @@ RUN wget -O redis-4.0.11.tar.gz http://download.redis.io/releases/redis-4.0.11.t
   make -j 3 PREFIX=$WORKSPACE/redis install && \
   cp redis.conf $WORKSPACE/redis/ && \
   sed -i 's/daemonize no/daemonize yes/' $WORKSPACE/redis/redis.conf && \
-  echo "export PATH=$WORKSPACE/redis/bin:$PATH" > /root/.bashrc && \
+  echo "export PATH=$WORKSPACE/redis/bin:$PATH" >> /root/.bashrc && \
   source /etc/profile
 
 
@@ -89,7 +89,13 @@ RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple tensorflow \
 ## ueface程序
 COPY ./UEface /build/UEface/
 
-RUN sh /build/UEface/docker/start.sh
+## 前端
+COPY ./app /build/app
+
+#RUN sh /build/UEface/docker/start.sh
+
+#ENV LANG C.UTF-8
+
 
 
 ## 入口

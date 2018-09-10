@@ -99,9 +99,9 @@ def process():
     # 人脸识别接口
     Recognition = faceNetRecognition()
     # 人脸 检测接口
-    faceDetect = MTCNNDetection(mtcnnDeteModel)
+    faceDetect = MTCNNDetection()
     # 人脸特征抽取接口
-    faceFeature = FaceNetExtract(faceNetModel)
+    faceFeature = FaceNetExtract()
 
     imageUtil = ImageUtil()                    # 人脸抠图的接口
     jump = True

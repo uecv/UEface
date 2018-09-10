@@ -289,8 +289,8 @@ if build "libvpx"; then
     #mkdir $PACKAGES/libvpx
     #git clone --depth 1 https://github.com/webmproject/libvpx.git $PACKAGES/libvpx
     # libvpx-1.7.0.tar.gz 在centos6会报错，centos7没有问题
-    extract "libvpx-1.5.0.tar.gz"
-    cd $TMP_PACKAGES/libvpx-1.5.0 || exit
+    extract "libvpx-1.7.0.tar.gz"
+    cd $TMP_PACKAGES/libvpx-1.7.0 || exit
 	execute ./configure --prefix=${WORKSPACE} --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
 	execute make -j $MJOBS
 	execute make install

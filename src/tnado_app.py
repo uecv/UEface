@@ -128,10 +128,11 @@ class CamHandler(tornado.web.RequestHandler):
 def make_app():
     return tornado.web.Application([
         (r"/get_camera", CamHandler),
-        (r'/live', SocketHandler),
+        (r'/ws', SocketHandler),
     ])
 
 def main():
+
     app = make_app()
     server = tornado.httpserver.HTTPServer(app)
     server.bind(5000)
