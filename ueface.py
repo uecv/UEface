@@ -9,6 +9,7 @@ def help():
     print("useage: python ueface web")
     print("useage: python ueface main")
     print("useage: python ueface initdb")
+    print("useage: python ueface build")
 def main():
     try:
         cmd = sys.argv[1]

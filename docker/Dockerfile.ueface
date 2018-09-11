@@ -105,15 +105,6 @@ COPY ./app /build/app
 
 ENV LC_ALL "zh_CN.UTF-8"
 
-#RUN sh /build/UEface/docker/start.sh
-
-## 入口
-ENTRYPOINT ["/build/UEface/docker/start.sh"]
-#ENTRYPOINT ["/bin/bash"]
-
-
-
-
 
 
 
