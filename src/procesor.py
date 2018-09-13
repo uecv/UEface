@@ -89,7 +89,7 @@ def process(source=source_path):
     # source_path是默认参数,从配置文件中获取
     #src = "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
     LOG.info(source)
-    video_capture = cv2.VideoCapture(source_path)
+    video_capture = cv2.VideoCapture(source)
     # video_capture.set(cv2.CAP_PROP_POS_FRAMES,25)
 
     dist_name_num ={}

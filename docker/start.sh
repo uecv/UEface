@@ -1,7 +1,7 @@
 source_url = $1
 
 ## 启动mysql
-mysql_install_db --user=root &&  mysqld_safe  --user=root &
+#mysql_install_db --user=root &&  mysqld_safe  --user=root &
 
 
 

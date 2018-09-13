@@ -1,44 +1,44 @@
-### web启动命令
+
+### docker单机版 
+
+#### 1.构建docker镜像离线文件准备
+创建一个目录face,目录下准备好以下内容：
+ffmpeg_packages： ffmpeg的依赖源码包  
+Python-3.6.6.tgz： python的源码包
+build-ffmpeg.sh： ffmpeg离线安装脚本,该脚本在UEface/docker文件夹里面
+UEface:  项目源码
+app:  打包后的WEBface的app代码文件
+
+#### 2.构建镜像
+进入face目录,运行下面的命令
+```
+docker build -f Dockerfile.ueface -t face:v0.7 .
+```
+#### 3.启动容器
+```
+docker run -it --name face3 -p:80:80 -p 5000:5000 \
+ -v /root/ueface/UEface/src/library/images/:/build/UEface/src/library/images/ \
+ face:v0.7 bash
+
+注意： 
+(1)目前版本映射的端口只能是80以及5000, 
+(2)images目录格式需要按照特定的格式放置,图片名字也是.
+
 ```
 
-uwsgi --master --http :5000 --process 4 --http-websockets --wsgi app:app
-```
-### spark启动命令
-```
- spark-submit    \
- --name "face"    \ 
- --master yarn \
- --deploy-mode client\  
- --conf "spark.yarn.appMasterEnv.SPARK_HOME=$SPARK_HOME"     \
- --conf "spark.yaDDrn.appMasterEnv.PYSPARK_PYTHON=$PYSPARK_PYTHON"\     
- --archives hdfs:///user/kenwood/src   \
- pyspark_main.py 
-```
-### bug
-```
-import cv2 报错　Error while loading shared libraries: libgthread-2.0.so.0”。
-apt-get install libglib2.0-0
-apt-get install libsm6
-apt-get install libxrender1
-apt-get install libxext-dev
-```
-### docker 
-```
-# 下载docker镜像
-zookeeker: docker pull zookeeper:latest
-kafka: docker pull wurstmeister/kafka:latest
 
-#启动zookeeper
-docker run -d --name zookeeper --publish 2181:2181 \
---volume /etc/localtime:/etc/localtime \
-zookeeper:latest
-#启动kafka
-docker run -d --name kafka --publish 9092:9092 \
---link zookeeper \
---env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
---env KAFKA_ADVERTISED_HOST_NAME=kafka所在宿主机的IP \
---env KAFKA_ADVERTISED_PORT=9092 \
---volume /etc/localtime:/etc/localtime \
-wurstmeister/kafka:latest
-
+#### 4.进入容器启动服务
+(1) 启动mysql
+```
+mysql_install_db --user=root &&  mysqld_safe  --user=root &
+```
+(2) 初始化脚本
+```
+sh /build/UEface/docker/start.sh
+```
+(3) 推流 & 开始识别视频流
+```
+sh /build/UEface/docker/push_stream.sh rtsp协议的视频流地址
+例如：
+sh /build/UEface/docker/push_stream.sh "rtsp://admin:qwe123456@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0"
 ```
