@@ -19,14 +19,7 @@ from settings import *
 from src.service import people
 from src.utils.redis_queue import RedisQueue
 
-"""
-conf = Config.Config(Constant.CONFIG_PATH)
-redis_host = conf.get('web', 'redis_host')
-redis_port = conf.get('web', 'redis_port')
-redis_queue = conf.get('web', 'redis_queue')
-image_root = conf.get('web', 'image_root')
-map_path = conf.get('web', 'map_path')
-"""
+
 queue = RedisQueue(
     host=redis_host,
     port=redis_port)
@@ -83,8 +76,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         #人脸库照片
 
         company_path = os.path.join(image_root,info.company_id)
-        print(os.path.join(company_path,info.image_path))
-        img = Image.open(os.path.join(image_path,info.image_path), 'r')
+        #print(os.path.join(company_path,info.image_path))
+        img = Image.open(os.path.join(company_path,info.image_path), 'r')
 
         buffered = BytesIO()
         img.save(buffered, format="JPEG")

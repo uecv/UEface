@@ -39,7 +39,7 @@ video_capture = cv2.VideoCapture(source_path)
 
 
 # 构建人脸特征库对象
-facelib = faceNetLib(faceLibPath)
+facelib = faceNetLib()
 # 人脸特征库
 known_face_dataset = facelib.getlib()
 

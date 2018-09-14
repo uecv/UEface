@@ -94,7 +94,7 @@ def process(source=source_path):
 
     dist_name_num ={}
     # 构建人脸特征库对象
-    facelib = faceNetLib(faceLibPath)
+    facelib = faceNetLib()
     # 人脸特征库
     known_face_dataset = facelib.getlib()
 

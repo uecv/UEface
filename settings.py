@@ -6,17 +6,15 @@
 """
 # coding = utf8
 import os
-import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #[source]
 source_path = "/build/testVideo.mp4"
 
-faceLibPath = os.path.join(BASE_DIR,"src/library/faceNetLib/facerec_128D.txt")
+
+#[model]
 mtcnnDeteModel = os.path.join(BASE_DIR,"src/Model/faceNet/models/")
 faceNetModel = os.path.join(BASE_DIR,"src/Model/faceNet/models/model-20170512-110547.ckpt-250000")
 
-
-feature_file=os.path.join(BASE_DIR,"src/library/faceNetLib/facerec_128D.txt")
 
 #[cache]
 image_path=os.path.join(BASE_DIR,"src/library/images")

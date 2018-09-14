@@ -56,7 +56,7 @@ RUN wget -O redis-4.0.11.tar.gz http://download.redis.io/releases/redis-4.0.11.t
 
 ## 复制离线准备好的包到docker中
 COPY ./ffmpeg_packages /build/ffmpeg_packages
-COPY ./build-ffmpeg.sh /build/build-ffmpeg.sh
+COPY ./UEface/docker/build-ffmpeg.sh /build/build-ffmpeg.sh
 
 ## 安装ffmpeg/ffserver
 RUN sh ./build-ffmpeg.sh --build
@@ -88,14 +88,11 @@ RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple tensorflow \
 
 #RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple numpy
 
-
 ## ueface程序
 COPY ./UEface /build/UEface/
 
 ## 前端
 COPY ./app /build/app
-
-
 
 ## 设置环境编码
 #RUN  yum -y install kde-l10n-Chinese telnet && \
