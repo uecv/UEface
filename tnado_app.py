@@ -62,36 +62,37 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         print("Just checking")
         global  count
         #recognition result
-        data = queue.get_nowait(redis_queue).decode('utf-8')
-        count +=1
-        # people_num
-        msg = dict({
-            "type": "GET_COUNT",
-            "NUMS": count
-        })
-        # print(eval(data)['user_id'])
+        if queue.qsize(redis_queue):
+            data = queue.get_nowait(redis_queue).decode('utf-8')
+            count +=1
+            # people_num
+            msg = dict({
+                "type": "GET_COUNT",
+                "NUMS": count
+            })
+            # print(eval(data)['user_id'])
 
-        result = eval(data)
-        name,image_path = people.get_people(eval(data)['user_id'])
+            result = eval(data)
+            name,image_path = people.get_people(eval(data)['user_id'])
 
-        #人脸库照片
-        img = Image.open(os.path.join(image_root,image_path), 'r')
-        buffered = BytesIO()
-        img.save(buffered, format="JPEG")
-        raw_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            #人脸库照片
+            img = Image.open(os.path.join(image_root,image_path), 'r')
+            buffered = BytesIO()
+            img.save(buffered, format="JPEG")
+            raw_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        result_dict = dict({'ts': result['ts'],
-                       #Todo 读数据库
-                       'name': name,
-                       'image': result['head_image'],
-                       'id':   result['id'],
-                       'raw_image': raw_image,
-                       'similarity': result['similarity'],
-                       'type': "GET_RECO_RESULT"})
-        if (time.time() - self.last > 1):
-            self.write_message(msg)
-            self.write_message(result_dict)
-            self.last = time.time()
+            result_dict = dict({'ts': result['ts'],
+                           #Todo 读数据库
+                           'name': name,
+                           'image': result['head_image'],
+                           'id':   result['id'],
+                           'raw_image': raw_image,
+                           'similarity': result['similarity'],
+                           'type': "GET_RECO_RESULT"})
+            if (time.time() - self.last > 1):
+                self.write_message(msg)
+                self.write_message(result_dict)
+                self.last = time.time()
 
 
 class CamHandler(tornado.web.RequestHandler):
