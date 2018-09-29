@@ -18,6 +18,7 @@ from tornado.ioloop import IOLoop
 from settings import *
 from src.service import people
 from src.utils.redis_queue import RedisQueue
+from src.service import recoginiton
 
 
 queue = RedisQueue(
@@ -128,10 +129,35 @@ class CamHandler(tornado.web.RequestHandler):
             }]
         }
         self.write(cam_dict)
+
+class GetTodayNum(tornado.web.RequestHandler):
+    def post(self, *args, **kwargs):
+        today = self.get_argument('today')
+        print ('today',today)
+        result = recoginiton.get_today_nums(today)
+        self.write(result)
+
+class GetLastWeek(tornado.web.RequestHandler):
+    def post(self, *args, **kwargs):
+        date = self.get_argument('date')
+        result = recoginiton.get_last_week(date)
+        self.write(result)
+
+#fake data
+class GetCamNum(tornado.web.RequestHandler):
+    def get(self, *args, **kwargs):
+        fake_data ={'online':4,
+                    'outline':2,
+                    'total_people':6}
+        self.write(fake_data)
+
 def make_app():
     return tornado.web.Application([
         (r"/get_camera", CamHandler),
         (r'/live', SocketHandler),
+        (r'/get_today_num',GetTodayNum),
+        (r'/get_last_week',GetLastWeek),
+        (r'/get_cam_num',GetCamNum),
     ])
 
 def main():
