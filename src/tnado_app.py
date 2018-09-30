@@ -131,6 +131,9 @@ class CamHandler(tornado.web.RequestHandler):
         self.write(cam_dict)
 
 class GetTodayNum(tornado.web.RequestHandler):
+
+
+
     def post(self, *args, **kwargs):
         today = self.get_argument('today')
         print ('today',today)
@@ -148,7 +151,7 @@ class GetCamNum(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         fake_data ={'online':4,
                     'outline':2,
-                    'total_people':6}
+                    'total':6}
         self.write(fake_data)
 
 def make_app():
