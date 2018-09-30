@@ -15,6 +15,7 @@ from src.utils.redis_queue import RedisQueue
 from src.utils import log
 from src.DrawPicture.DrawFace import ImageUtil
 from settings import *
+from src.service import recoginiton
 
 """
 
@@ -165,7 +166,7 @@ def process(source=source_path):
             # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
             result_dict = {}
-            time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            time = (datetime.datetime.today()-datetime.timedelta(6)).strftime("%Y-%m-%d %H:%M:%S")
             head_imgs = imageUtil.getFaceImgbyLocation(frame, locations)
 
             addFrame2Cach(face_id, head_imgs, dist_name_num)
@@ -196,8 +197,8 @@ def process(source=source_path):
 
                 for (id_simi,head_image) in zip(web_ids,web_headimages):
                     id, simi=id_simi
-                    if id == "Unknown":
-                        continue
+                    # if id == "Unknown":
+                    #     continue
                     # if redis_connect.exists_key(id):
                     #     continue
                     print(id)
@@ -217,6 +218,14 @@ def process(source=source_path):
                     LOG.debug(result_dict['user_id'])
                     redis_connect.put(redis_queue,result_dict)
                     print(id)
+
+                    # 写入数据库
+                    if id == "Unknown":
+                        recongize_result = recoginiton.Recoginition(cam_id=1,user_id=id,cap_time=time)
+                        recoginiton.insert_result(recongize_result)
+                        continue
+                    recongize_result = recoginiton.Recoginition(cam_id=1, user_id=id, cap_time=time)
+                    recoginiton.insert_result(recongize_result)
                 dist_name_num = {}  #清空缓存
 
                 countFrame = 0 #重新开始计数
