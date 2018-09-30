@@ -43,8 +43,18 @@ def get_last_week(today):
     unknow_id = session.query(func.date_format(Recoginition.cap_time, "%Y-%m-%d"),func.count()).filter(Recoginition.user_id =="Unknown").group_by(cast(Recoginition.cap_time,DATE)).all()
     print ('know_id',know_id)
     print ('unknow_id',unknow_id)
-    return dict({'know':know_id,
-                 'unknow':unknow_id})
+    week_list = [(datetime.datetime.today()-datetime.timedelta(i)).strftime("%Y-%m-%d")for i in range(0,7)]
+    unknow_week_dict = {i:0 for i in week_list}
+    know_week_dict = {i:0 for i in week_list}
+    #Todo 推导式化
+    for i in unknow_id:
+        if i[0] in unknow_week_dict.keys():
+            unknow_week_dict[i[0]] = i[1]
+    for i in know_id:
+        if i[0] in know_week_dict:
+            know_week_dict[i[0]] = i[1]
+    return dict({'know':know_week_dict,
+                 'unknow':unknow_week_dict})
 
 
 
