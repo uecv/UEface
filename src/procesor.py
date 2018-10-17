@@ -199,6 +199,11 @@ def process(source=source_path):
                     id, simi=id_simi
                     # if id == "Unknown":
                     #     continue
+                    # 写入数据库
+                    if id == "Unknown":
+                        recongize_result = recoginiton.Recoginition(cam_id=1, user_id=id, cap_time=time)
+                        recoginiton.insert_result(recongize_result)
+                        continue
                     # if redis_connect.exists_key(id):
                     #     continue
                     print(id)
@@ -219,11 +224,7 @@ def process(source=source_path):
                     redis_connect.put(redis_queue,result_dict)
                     print(id)
 
-                    # 写入数据库
-                    if id == "Unknown":
-                        recongize_result = recoginiton.Recoginition(cam_id=1,user_id=id,cap_time=time)
-                        recoginiton.insert_result(recongize_result)
-                        continue
+
                     recongize_result = recoginiton.Recoginition(cam_id=1, user_id=id, cap_time=time)
                     recoginiton.insert_result(recongize_result)
                 dist_name_num = {}  #清空缓存
