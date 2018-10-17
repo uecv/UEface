@@ -90,7 +90,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                        'image': result['head_image'],
                        'id':   result['id'],
                        'raw_image': raw_image,
-                       'similarity': int(result['similarity']),
+                       'similarity': int(result['similarity']*100),
                        'type': "GET_RECO_RESULT"})
         if (time.time() - self.last > 1):
             self.write_message(msg)
