@@ -219,7 +219,7 @@ def process(source=source_path):
                     result_dict['ts'] = time
                     result_dict['user_id'] = id  # list
                     result_dict['head_image'] = img_head_str  # list
-                    result_dict['similarity'] = int(simi)  # list
+                    result_dict['similarity'] = int(simi*100)  # list
                     LOG.debug(result_dict['user_id'])
                     redis_connect.put(redis_queue,result_dict)
                     print(id)
