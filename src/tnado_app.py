@@ -156,11 +156,11 @@ class GetCamNum(tornado.web.RequestHandler):
 
 def make_app():
     return tornado.web.Application([
-        (r"/get_camera", CamHandler),
-        (r'/live', SocketHandler),
-        (r'/get_today_num',GetTodayNum),
-        (r'/get_last_week',GetLastWeek),
-        (r'/get_cam_num',GetCamNum),
+        (r"/api/get_camera", CamHandler),
+        (r'/api/live', SocketHandler),
+        (r'/api/get_today_num',GetTodayNum),
+        (r'/api/get_last_week',GetLastWeek),
+        (r'/api/get_cam_num',GetCamNum),
     ])
 
 def main():
