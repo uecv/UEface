@@ -21,7 +21,7 @@ class Recoginition(db.Base):
     # Todo id自增
     id = Column(Integer,autoincrement=True,primary_key=True)
     cam_id = Column(Integer,nullable=False)
-    user_id = Column(Integer,nullable=False)
+    user_id = Column(String(512),nullable=False)
     cap_time = Column(DATETIME,default=datetime.datetime)
 
     def __repr__(self):
