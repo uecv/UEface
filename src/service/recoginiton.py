@@ -31,8 +31,10 @@ class Recoginition(db.Base):
 def get_today_nums(today):
     date = datetime.datetime.strptime(today,"%Y-%m-%d")
     print ('date',date)
-    know_id = session.query(Recoginition).filter(cast(Recoginition.cap_time, DATE)==date,Recoginition.user_id !="Unknown").count()
-    unknow_id = session.query(Recoginition).filter(cast(Recoginition.cap_time, DATE)==date,Recoginition.user_id =="Unknown").count()
+    # know_id = session.query(Recoginition).filter(cast(Recoginition.cap_time, DATE)==date,Recoginition.user_id !="Unknown").count()
+    know_id = session.query(func.date_format(Recoginition.cap_time, "%Y-%m-%d"),func.count()).filter(Recoginition.user_id !="Unknown").count()
+    unknow_id = session.query(func.date_format(Recoginition.cap_time, "%Y-%m-%d"),func.count()).filter(Recoginition.user_id =="Unknown").count()
+
     return dict({'know':know_id,
             'unknow':unknow_id,
             'total':know_id+unknow_id})
@@ -69,7 +71,7 @@ if __name__ == '__main__':
     # session.commit()
     # insert_result(recon)
     # print(get_nums(1))
-    print (get_last_week('2018-09-29'))
+    print (get_today_nums('2018-10-17'))
 
 """
 #建表sql
