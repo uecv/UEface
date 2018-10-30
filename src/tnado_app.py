@@ -131,9 +131,6 @@ class CamHandler(tornado.web.RequestHandler):
         self.write(cam_dict)
 
 class GetTodayNum(tornado.web.RequestHandler):
-
-
-
     def post(self, *args, **kwargs):
         today = self.get_argument('today')
         print ('today',today)
